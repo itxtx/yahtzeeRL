@@ -1,0 +1,164 @@
+"""Training entrypoint for Yahtzee self-play."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import time
+from dataclasses import asdict, dataclass
+from pathlib import Path
+
+import jax
+import jax.numpy as jnp
+import optax
+import orbax.checkpoint as ocp
+import rlax
+from flax.training import train_state
+from tqdm import trange
+
+import yahtzee_rl.constants as c
+from yahtzee_rl.env import observation, reset
+from yahtzee_rl.model import YahtzeeActorCritic
+from yahtzee_rl.self_play import generate_self_play, trajectory_observation
+
+
+@dataclass(frozen=True)
+class TrainConfig:
+    seed: int = 0
+    steps: int = 1000
+    batch_size: int = 64
+    hidden_dim: int = 256
+    num_simulations: int = 32
+    learning_rate: float = 3e-4
+    value_coef: float = 1.0
+    entropy_coef: float = 1e-3
+    checkpoint_dir: str = "checkpoints"
+    checkpoint_every: int = 100
+    log_every: int = 10
+
+
+class AgentState(train_state.TrainState):
+    pass
+
+
+def create_train_state(config: TrainConfig) -> tuple[AgentState, YahtzeeActorCritic, jax.Array]:
+    key = jax.random.PRNGKey(config.seed)
+    key, init_key, env_key = jax.random.split(key, 3)
+    model = YahtzeeActorCritic(hidden_dims=(config.hidden_dim, config.hidden_dim))
+    dummy_state = reset(env_key, config.batch_size)
+    params = model.init(init_key, observation(dummy_state))["params"]
+    tx = optax.adam(config.learning_rate)
+    state = AgentState.create(apply_fn=model.apply, params=params, tx=tx)
+    return state, model, key
+
+
+def make_update_fn(model: YahtzeeActorCritic, config: TrainConfig):
+    def loss_fn(params, trajectory):
+        obs = trajectory_observation(trajectory)
+        logits, values = model.apply({"params": params}, obs)
+
+        action_weights = trajectory.action_weights.reshape((-1, c.NUM_ACTIONS))
+        returns = trajectory.returns.reshape((-1,))
+        valid = trajectory.valid.reshape((-1,)).astype(jnp.float32)
+        denom = jnp.maximum(jnp.sum(valid), 1.0)
+
+        log_probs = jax.nn.log_softmax(logits)
+        policy_loss = -jnp.sum(action_weights * log_probs, axis=-1)
+        value_loss = rlax.l2_loss(values - returns)
+        entropy = -jnp.sum(jax.nn.softmax(logits) * log_probs, axis=-1)
+
+        policy_loss = jnp.sum(policy_loss * valid) / denom
+        value_loss = jnp.sum(value_loss * valid) / denom
+        entropy = jnp.sum(entropy * valid) / denom
+        total = policy_loss + config.value_coef * value_loss - config.entropy_coef * entropy
+        metrics = {
+            "loss": total,
+            "policy_loss": policy_loss,
+            "value_loss": value_loss,
+            "entropy": entropy,
+        }
+        return total, metrics
+
+    def update_step(state: AgentState, rng_key: jax.Array):
+        play_key, grad_key = jax.random.split(rng_key)
+        del grad_key
+        trajectory, play_metrics = generate_self_play(
+            model,
+            {"params": state.params},
+            play_key,
+            batch_size=config.batch_size,
+            num_simulations=config.num_simulations,
+        )
+        (loss, metrics), grads = jax.value_and_grad(loss_fn, has_aux=True)(
+            state.params, trajectory
+        )
+        new_state = state.apply_gradients(grads=grads)
+        metrics = metrics | play_metrics | {"loss": loss}
+        return new_state, metrics
+
+    return jax.jit(update_step)
+
+
+def save_checkpoint(path: Path, state: AgentState, config: TrainConfig, step: int) -> None:
+    path = path.expanduser().resolve()
+    path.mkdir(parents=True, exist_ok=True)
+    checkpointer = ocp.PyTreeCheckpointer()
+    payload = {"params": state.params, "opt_state": state.opt_state, "step": step}
+    checkpointer.save(path / f"step_{step:06d}", payload, force=True)
+    (path / "config.json").write_text(json.dumps(asdict(config), indent=2), encoding="utf-8")
+
+
+def train(config: TrainConfig) -> AgentState:
+    state, model, key = create_train_state(config)
+    update_step = make_update_fn(model, config)
+    checkpoint_dir = Path(config.checkpoint_dir)
+
+    print(f"JAX devices: {jax.devices()}")
+    print(f"Training {config.steps} updates with batch={config.batch_size}, sims={config.num_simulations}")
+
+    last_log = time.time()
+    for step_idx in trange(1, config.steps + 1):
+        key, step_key = jax.random.split(key)
+        state, metrics = update_step(state, step_key)
+
+        if step_idx % config.log_every == 0 or step_idx == 1:
+            ready_metrics = jax.tree_util.tree_map(lambda x: float(jax.device_get(x)), metrics)
+            now = time.time()
+            steps_per_sec = config.log_every / max(now - last_log, 1e-6)
+            last_log = now
+            print(
+                "step={step} loss={loss:.4f} policy={policy_loss:.4f} "
+                "value={value_loss:.4f} entropy={entropy:.3f} "
+                "p0={mean_player0_score:.1f} p1={mean_player1_score:.1f} "
+                "draw={draw_rate:.2f} ups={ups:.2f}".format(
+                    step=step_idx, ups=steps_per_sec, **ready_metrics
+                )
+            )
+
+        if step_idx % config.checkpoint_every == 0 or step_idx == config.steps:
+            save_checkpoint(checkpoint_dir, state, config, step_idx)
+
+    return state
+
+
+def parse_args() -> TrainConfig:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--steps", type=int, default=TrainConfig.steps)
+    parser.add_argument("--batch-size", type=int, default=TrainConfig.batch_size)
+    parser.add_argument("--hidden-dim", type=int, default=TrainConfig.hidden_dim)
+    parser.add_argument("--num-simulations", type=int, default=TrainConfig.num_simulations)
+    parser.add_argument("--learning-rate", type=float, default=TrainConfig.learning_rate)
+    parser.add_argument("--checkpoint-dir", type=str, default=TrainConfig.checkpoint_dir)
+    parser.add_argument("--checkpoint-every", type=int, default=TrainConfig.checkpoint_every)
+    parser.add_argument("--log-every", type=int, default=TrainConfig.log_every)
+    parser.add_argument("--seed", type=int, default=TrainConfig.seed)
+    args = parser.parse_args()
+    return TrainConfig(**vars(args))
+
+
+def main() -> None:
+    train(parse_args())
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yahtzee-rl"
+version = "0.1.0"
+description = "JAX/Flax/RLax Yahtzee self-play agent with MCTS."
+requires-python = ">=3.10"
+dependencies = [
+  "jax>=0.6.2",
+  "flax>=0.10.0",
+  "optax>=0.2.4",
+  "rlax>=0.1.7",
+  "mctx>=0.0.6",
+  "orbax-checkpoint>=0.8.0",
+  "numpy>=2.0",
+  "tqdm>=4.66",
+  "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+]
+
+[project.scripts]
+yahtzee-train = "yahtzee_rl.train:main"
+yahtzee-eval = "yahtzee_rl.evaluate:main"
+
+[tool.setuptools.packages.find]
+include = ["yahtzee_rl*"]

@@ -1,0 +1,10 @@
+jax>=0.6.2
+flax>=0.10.0
+optax>=0.2.4
+rlax>=0.1.7
+mctx>=0.0.6
+orbax-checkpoint>=0.8.0
+numpy>=2.0
+tqdm>=4.66
+matplotlib>=3.8
+pytest>=8.0
