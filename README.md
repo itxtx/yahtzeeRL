@@ -30,3 +30,12 @@ notebooks/colab_self_play.ipynb
 The notebook mounts Drive, installs the repo, verifies `jax.devices()`, and
 copies the repo to `/content/yahtzeeRL` for faster Colab execution while writing
 checkpoints back to Drive.
+
+## Play Against The Agent
+
+```bash
+python -m yahtzee_rl.play_cli --checkpoint checkpoints/colab_run --num-simulations 32
+```
+
+During your turn, choose reroll actions as `h00` through `h31` or score actions
+as `s00` through `s12`. The CLI prints the legal actions each turn.

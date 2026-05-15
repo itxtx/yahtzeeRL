@@ -27,6 +27,7 @@ dev = [
 [project.scripts]
 yahtzee-train = "yahtzee_rl.train:main"
 yahtzee-eval = "yahtzee_rl.evaluate:main"
+yahtzee-play = "yahtzee_rl.play_cli:main"
 
 [tool.setuptools.packages.find]
 include = ["yahtzee_rl*"]
