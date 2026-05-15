@@ -28,4 +28,5 @@ notebooks/colab_self_play.ipynb
 ```
 
 The notebook mounts Drive, installs the repo, verifies `jax.devices()`, and
-writes checkpoints back to Drive.
+copies the repo to `/content/yahtzeeRL` for faster Colab execution while writing
+checkpoints back to Drive.

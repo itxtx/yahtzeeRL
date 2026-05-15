@@ -108,6 +108,30 @@ def save_checkpoint(path: Path, state: AgentState, config: TrainConfig, step: in
     (path / "config.json").write_text(json.dumps(asdict(config), indent=2), encoding="utf-8")
 
 
+def latest_checkpoint(path: str | Path) -> Path:
+    path = Path(path).expanduser().resolve()
+    candidates = sorted(path.glob("step_*"))
+    if not candidates:
+        raise FileNotFoundError(f"No checkpoints found in {path}")
+    return candidates[-1]
+
+
+def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tuple[AgentState, YahtzeeActorCritic, int]:
+    path = Path(path).expanduser().resolve()
+    checkpoint_path = latest_checkpoint(path) if path.is_dir() and path.name.startswith("step_") is False else path
+    config_path = checkpoint_path.parent / "config.json"
+    if config is None and config_path.exists():
+        config = TrainConfig(**json.loads(config_path.read_text(encoding="utf-8")))
+    elif config is None:
+        config = TrainConfig(batch_size=1)
+
+    state, model, _ = create_train_state(config)
+    checkpointer = ocp.PyTreeCheckpointer()
+    restored = checkpointer.restore(checkpoint_path)
+    state = state.replace(params=restored["params"], opt_state=restored["opt_state"])
+    return state, model, int(restored["step"])
+
+
 def train(config: TrainConfig) -> AgentState:
     state, model, key = create_train_state(config)
     update_step = make_update_fn(model, config)
@@ -130,6 +154,7 @@ def train(config: TrainConfig) -> AgentState:
                 "step={step} loss={loss:.4f} policy={policy_loss:.4f} "
                 "value={value_loss:.4f} entropy={entropy:.3f} "
                 "p0={mean_player0_score:.1f} p1={mean_player1_score:.1f} "
+                "p0w={player0_win_rate:.2f} p1w={player1_win_rate:.2f} "
                 "draw={draw_rate:.2f} ups={ups:.2f}".format(
                     step=step_idx, ups=steps_per_sec, **ready_metrics
                 )

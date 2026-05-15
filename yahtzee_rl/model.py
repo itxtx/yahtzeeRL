@@ -13,7 +13,6 @@ def flatten_observation(obs: dict[str, jax.Array]) -> jax.Array:
         obs["dice"].shape[0], c.NUM_DICE * c.NUM_FACES
     )
     rolls_one_hot = jax.nn.one_hot(obs["rolls_left"], c.MAX_ROLLS_LEFT + 1)
-    active_one_hot = jax.nn.one_hot(obs["active_player"], c.NUM_PLAYERS)
     return jnp.concatenate(
         [
             obs["own_filled"],
@@ -22,7 +21,6 @@ def flatten_observation(obs: dict[str, jax.Array]) -> jax.Array:
             obs["opp_scores"],
             dice_one_hot,
             rolls_one_hot,
-            active_one_hot,
         ],
         axis=-1,
     )

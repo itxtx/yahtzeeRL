@@ -92,7 +92,18 @@ def generate_self_play(
     metrics = {
         "mean_player0_score": jnp.mean(total_score(final_state.scorecards)[:, 0]),
         "mean_player1_score": jnp.mean(total_score(final_state.scorecards)[:, 1]),
-        "draw_rate": jnp.mean(total_score(final_state.scorecards)[:, 0] == total_score(final_state.scorecards)[:, 1]),
+        "player0_win_rate": jnp.mean(
+            total_score(final_state.scorecards)[:, 0]
+            > total_score(final_state.scorecards)[:, 1]
+        ),
+        "player1_win_rate": jnp.mean(
+            total_score(final_state.scorecards)[:, 1]
+            > total_score(final_state.scorecards)[:, 0]
+        ),
+        "draw_rate": jnp.mean(
+            total_score(final_state.scorecards)[:, 0]
+            == total_score(final_state.scorecards)[:, 1]
+        ),
     }
     return trajectory, metrics
 

@@ -27,7 +27,9 @@ def make_recurrent_fn(model):
     def recurrent_fn(params, rng_key, action, embedding: EnvState):
         next_state, reward = step(embedding, action, rng_key)
         logits, value = _predict(model, params, next_state)
-        discount = jnp.where(next_state.done, 0.0, 1.0).astype(jnp.float32)
+        player_changed = next_state.active_player != embedding.active_player
+        discount = jnp.where(player_changed, -1.0, 1.0)
+        discount = jnp.where(next_state.done, 0.0, discount).astype(jnp.float32)
         out = mctx.RecurrentFnOutput(
             reward=reward,
             discount=discount,
