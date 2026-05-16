@@ -35,7 +35,19 @@ checkpoints back to Drive.
 
 ```bash
 python -m yahtzee_rl.play_cli --checkpoint checkpoints/colab_run --num-simulations 32
+python -m yahtzee_rl.play_cli --checkpoint checkpoints/colab_run --debug-agent --top-k 5
 ```
 
 During your turn, choose reroll actions as `h00` through `h31` or score actions
 as `s00` through `s12`. The CLI prints the legal actions each turn.
+
+## Evaluate Agents
+
+```bash
+python -m yahtzee_rl.evaluate --agent-a mcts --checkpoint-a checkpoints/colab_run --agent-b heuristic --num-games 256 --sims-a 32
+python -m yahtzee_rl.evaluate --agent-a mcts --checkpoint-a checkpoints/run_a --agent-b mcts --checkpoint-b checkpoints/run_b --num-games 256
+python -m yahtzee_rl.evaluate --num-games 16
+```
+
+The evaluator alternates seats so first-player effects do not dominate the
+reported win rate, score margin, and optional per-category means.

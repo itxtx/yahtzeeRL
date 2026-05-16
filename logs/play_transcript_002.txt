@@ -1,0 +1,2891 @@
+/usr/local/lib/python3.12/dist-packages/orbax/checkpoint/_src/serialization/jax_array_handlers.py:718: UserWarning: Sharding info not provided when restoring. Populating sharding info from sharding file. Please note restoration time will be slightly increased due to reading from file. Note also that this option is unsafe when restoring on a different topology than the checkpoint was saved with.
+  warnings.warn(
+Loaded checkpoint step 2000 from checkpoints/colab_run_3
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --       --
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             --       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                       0        0
+
+Current dice: [3, 5, 5, 4, 6] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 3
+  h02: keep 5
+  h03: keep 3 5
+  h04: keep 5
+  h05: keep 3 5
+  h06: keep 5 5
+  h07: keep 3 5 5
+  h08: keep 4
+  h09: keep 3 4
+  h10: keep 5 4
+  h11: keep 3 5 4
+  h12: keep 5 4
+  h13: keep 3 5 4
+  h14: keep 5 5 4
+  h15: keep 3 5 5 4
+  h16: keep 6
+  h17: keep 3 6
+  h18: keep 5 6
+  h19: keep 3 5 6
+  h20: keep 5 6
+  h21: keep 3 5 6
+  h22: keep 5 5 6
+  h23: keep 3 5 5 6
+  h24: keep 4 6
+  h25: keep 3 4 6
+  h26: keep 5 4 6
+  h27: keep 3 5 4 6
+  h28: keep 5 4 6
+  h29: keep 3 5 4 6
+  h30: keep 5 5 4 6
+  h31: keep 3 5 5 4 6
+
+Score actions:
+  s00: ones (0 pts)
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s03: fours (4 pts)
+  s04: fives (10 pts)
+  s05: sixes (6 pts)
+  s06: three_of_a_kind (0 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s09: small_straight (30 pts)
+  s10: large_straight (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (23 pts)
+
+Choose action (h00-h31, s00-s12, or q): h27
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --       --
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             --       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                       0        0
+
+Current dice: [3, 5, 5, 4, 6] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 3
+  h02: keep 5
+  h03: keep 3 5
+  h04: keep 5
+  h05: keep 3 5
+  h06: keep 5 5
+  h07: keep 3 5 5
+  h08: keep 4
+  h09: keep 3 4
+  h10: keep 5 4
+  h11: keep 3 5 4
+  h12: keep 5 4
+  h13: keep 3 5 4
+  h14: keep 5 5 4
+  h15: keep 3 5 5 4
+  h16: keep 6
+  h17: keep 3 6
+  h18: keep 5 6
+  h19: keep 3 5 6
+  h20: keep 5 6
+  h21: keep 3 5 6
+  h22: keep 5 5 6
+  h23: keep 3 5 5 6
+  h24: keep 4 6
+  h25: keep 3 4 6
+  h26: keep 5 4 6
+  h27: keep 3 5 4 6
+  h28: keep 5 4 6
+  h29: keep 3 5 4 6
+  h30: keep 5 5 4 6
+  h31: keep 3 5 5 4 6
+
+Score actions:
+  s00: ones (0 pts)
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s03: fours (4 pts)
+  s04: fives (10 pts)
+  s05: sixes (6 pts)
+  s06: three_of_a_kind (0 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s09: small_straight (30 pts)
+  s10: large_straight (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (23 pts)
+
+Choose action (h00-h31, s00-s12, or q): h27
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --       --
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             --       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                       0        0
+
+Current dice: [3, 5, 2, 4, 6] | rolls left: 0
+
+Score actions:
+  s00: ones (0 pts)
+  s01: twos (2 pts)
+  s02: threes (3 pts)
+  s03: fours (4 pts)
+  s04: fives (5 pts)
+  s05: sixes (6 pts)
+  s06: three_of_a_kind (0 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s09: small_straight (30 pts)
+  s10: large_straight (40 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (20 pts)
+
+Choose action (h00-h31, s00-s12, or q): s10
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --       --
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      40        0
+
+Current dice: [4, 1, 2, 4, 5] | rolls left: 2
+
+Agent chooses: keep 4 5
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --       --
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      40        0
+
+Current dice: [4, 5, 3, 1, 5] | rolls left: 1
+
+Agent chooses: keep 4
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --       --
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      40        0
+
+Current dice: [4, 4, 3, 1, 5] | rolls left: 0
+
+Agent chooses: score ones
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      40        1
+
+Current dice: [3, 1, 4, 5, 3] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 3
+  h02: keep 1
+  h03: keep 3 1
+  h04: keep 4
+  h05: keep 3 4
+  h06: keep 1 4
+  h07: keep 3 1 4
+  h08: keep 5
+  h09: keep 3 5
+  h10: keep 1 5
+  h11: keep 3 1 5
+  h12: keep 4 5
+  h13: keep 3 4 5
+  h14: keep 1 4 5
+  h15: keep 3 1 4 5
+  h16: keep 3
+  h17: keep 3 3
+  h18: keep 1 3
+  h19: keep 3 1 3
+  h20: keep 4 3
+  h21: keep 3 4 3
+  h22: keep 1 4 3
+  h23: keep 3 1 4 3
+  h24: keep 5 3
+  h25: keep 3 5 3
+  h26: keep 1 5 3
+  h27: keep 3 1 5 3
+  h28: keep 4 5 3
+  h29: keep 3 4 5 3
+  h30: keep 1 4 5 3
+  h31: keep 3 1 4 5 3
+
+Score actions:
+  s00: ones (1 pts)
+  s01: twos (0 pts)
+  s02: threes (6 pts)
+  s03: fours (4 pts)
+  s04: fives (5 pts)
+  s05: sixes (0 pts)
+  s06: three_of_a_kind (0 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s09: small_straight (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (16 pts)
+
+Choose action (h00-h31, s00-s12, or q): h17
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      40        1
+
+Current dice: [3, 5, 4, 5, 3] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 3
+  h02: keep 5
+  h03: keep 3 5
+  h04: keep 4
+  h05: keep 3 4
+  h06: keep 5 4
+  h07: keep 3 5 4
+  h08: keep 5
+  h09: keep 3 5
+  h10: keep 5 5
+  h11: keep 3 5 5
+  h12: keep 4 5
+  h13: keep 3 4 5
+  h14: keep 5 4 5
+  h15: keep 3 5 4 5
+  h16: keep 3
+  h17: keep 3 3
+  h18: keep 5 3
+  h19: keep 3 5 3
+  h20: keep 4 3
+  h21: keep 3 4 3
+  h22: keep 5 4 3
+  h23: keep 3 5 4 3
+  h24: keep 5 3
+  h25: keep 3 5 3
+  h26: keep 5 5 3
+  h27: keep 3 5 5 3
+  h28: keep 4 5 3
+  h29: keep 3 4 5 3
+  h30: keep 5 4 5 3
+  h31: keep 3 5 4 5 3
+
+Score actions:
+  s00: ones (0 pts)
+  s01: twos (0 pts)
+  s02: threes (6 pts)
+  s03: fours (4 pts)
+  s04: fives (10 pts)
+  s05: sixes (0 pts)
+  s06: three_of_a_kind (0 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s09: small_straight (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (20 pts)
+
+Choose action (h00-h31, s00-s12, or q): h07
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             --       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      40        1
+
+Current dice: [3, 5, 4, 2, 5] | rolls left: 0
+
+Score actions:
+  s00: ones (0 pts)
+  s01: twos (2 pts)
+  s02: threes (3 pts)
+  s03: fours (4 pts)
+  s04: fives (10 pts)
+  s05: sixes (0 pts)
+  s06: three_of_a_kind (0 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s09: small_straight (30 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (19 pts)
+
+Choose action (h00-h31, s00-s12, or q): s09
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      70        1
+
+Current dice: [3, 4, 3, 1, 3] | rolls left: 2
+
+Agent chooses: keep 3 3
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      70        1
+
+Current dice: [3, 3, 1, 2, 3] | rolls left: 1
+
+Agent chooses: keep 3 1 3
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --       --
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      70        1
+
+Current dice: [2, 3, 1, 3, 3] | rolls left: 0
+
+Agent chooses: score threes
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      70       10
+
+Current dice: [4, 1, 6, 1, 1] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 4
+  h02: keep 1
+  h03: keep 4 1
+  h04: keep 6
+  h05: keep 4 6
+  h06: keep 1 6
+  h07: keep 4 1 6
+  h08: keep 1
+  h09: keep 4 1
+  h10: keep 1 1
+  h11: keep 4 1 1
+  h12: keep 6 1
+  h13: keep 4 6 1
+  h14: keep 1 6 1
+  h15: keep 4 1 6 1
+  h16: keep 1
+  h17: keep 4 1
+  h18: keep 1 1
+  h19: keep 4 1 1
+  h20: keep 6 1
+  h21: keep 4 6 1
+  h22: keep 1 6 1
+  h23: keep 4 1 6 1
+  h24: keep 1 1
+  h25: keep 4 1 1
+  h26: keep 1 1 1
+  h27: keep 4 1 1 1
+  h28: keep 6 1 1
+  h29: keep 4 6 1 1
+  h30: keep 1 6 1 1
+  h31: keep 4 1 6 1 1
+
+Score actions:
+  s00: ones (3 pts)
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s03: fours (4 pts)
+  s04: fives (0 pts)
+  s05: sixes (6 pts)
+  s06: three_of_a_kind (13 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (13 pts)
+
+Choose action (h00-h31, s00-s12, or q): h26
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      70       10
+
+Current dice: [6, 1, 4, 1, 1] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 1
+  h03: keep 6 1
+  h04: keep 4
+  h05: keep 6 4
+  h06: keep 1 4
+  h07: keep 6 1 4
+  h08: keep 1
+  h09: keep 6 1
+  h10: keep 1 1
+  h11: keep 6 1 1
+  h12: keep 4 1
+  h13: keep 6 4 1
+  h14: keep 1 4 1
+  h15: keep 6 1 4 1
+  h16: keep 1
+  h17: keep 6 1
+  h18: keep 1 1
+  h19: keep 6 1 1
+  h20: keep 4 1
+  h21: keep 6 4 1
+  h22: keep 1 4 1
+  h23: keep 6 1 4 1
+  h24: keep 1 1
+  h25: keep 6 1 1
+  h26: keep 1 1 1
+  h27: keep 6 1 1 1
+  h28: keep 4 1 1
+  h29: keep 6 4 1 1
+  h30: keep 1 4 1 1
+  h31: keep 6 1 4 1 1
+
+Score actions:
+  s00: ones (3 pts)
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s03: fours (4 pts)
+  s04: fives (0 pts)
+  s05: sixes (6 pts)
+  s06: three_of_a_kind (13 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (13 pts)
+
+Choose action (h00-h31, s00-s12, or q): h26
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                       --        1
+twos                       --       --
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      70       10
+
+Current dice: [2, 1, 5, 1, 1] | rolls left: 0
+
+Score actions:
+  s00: ones (3 pts)
+  s01: twos (2 pts)
+  s02: threes (0 pts)
+  s03: fours (0 pts)
+  s04: fives (5 pts)
+  s05: sixes (0 pts)
+  s06: three_of_a_kind (10 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (10 pts)
+
+Choose action (h00-h31, s00-s12, or q): s00
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --       --
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      73       10
+
+Current dice: [2, 1, 5, 5, 2] | rolls left: 2
+
+Agent chooses: keep 5 5 2
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --       --
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      73       10
+
+Current dice: [1, 1, 5, 5, 2] | rolls left: 1
+
+Agent chooses: keep 1 5 2
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --       --
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      73       10
+
+Current dice: [2, 1, 5, 3, 2] | rolls left: 0
+
+Agent chooses: score twos
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      73       14
+
+Current dice: [6, 3, 3, 2, 6] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 3
+  h03: keep 6 3
+  h04: keep 3
+  h05: keep 6 3
+  h06: keep 3 3
+  h07: keep 6 3 3
+  h08: keep 2
+  h09: keep 6 2
+  h10: keep 3 2
+  h11: keep 6 3 2
+  h12: keep 3 2
+  h13: keep 6 3 2
+  h14: keep 3 3 2
+  h15: keep 6 3 3 2
+  h16: keep 6
+  h17: keep 6 6
+  h18: keep 3 6
+  h19: keep 6 3 6
+  h20: keep 3 6
+  h21: keep 6 3 6
+  h22: keep 3 3 6
+  h23: keep 6 3 3 6
+  h24: keep 2 6
+  h25: keep 6 2 6
+  h26: keep 3 2 6
+  h27: keep 6 3 2 6
+  h28: keep 3 2 6
+  h29: keep 6 3 2 6
+  h30: keep 3 3 2 6
+  h31: keep 6 3 3 2 6
+
+Score actions:
+  s01: twos (2 pts)
+  s02: threes (6 pts)
+  s03: fours (0 pts)
+  s04: fives (0 pts)
+  s05: sixes (12 pts)
+  s06: three_of_a_kind (0 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (20 pts)
+
+Choose action (h00-h31, s00-s12, or q): h17
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      73       14
+
+Current dice: [6, 2, 6, 1, 6] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 2
+  h03: keep 6 2
+  h04: keep 6
+  h05: keep 6 6
+  h06: keep 2 6
+  h07: keep 6 2 6
+  h08: keep 1
+  h09: keep 6 1
+  h10: keep 2 1
+  h11: keep 6 2 1
+  h12: keep 6 1
+  h13: keep 6 6 1
+  h14: keep 2 6 1
+  h15: keep 6 2 6 1
+  h16: keep 6
+  h17: keep 6 6
+  h18: keep 2 6
+  h19: keep 6 2 6
+  h20: keep 6 6
+  h21: keep 6 6 6
+  h22: keep 2 6 6
+  h23: keep 6 2 6 6
+  h24: keep 1 6
+  h25: keep 6 1 6
+  h26: keep 2 1 6
+  h27: keep 6 2 1 6
+  h28: keep 6 1 6
+  h29: keep 6 6 1 6
+  h30: keep 2 6 1 6
+  h31: keep 6 2 6 1 6
+
+Score actions:
+  s01: twos (2 pts)
+  s02: threes (0 pts)
+  s03: fours (0 pts)
+  s04: fives (0 pts)
+  s05: sixes (18 pts)
+  s06: three_of_a_kind (21 pts)
+  s07: four_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (21 pts)
+
+Choose action (h00-h31, s00-s12, or q): h21
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             --       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      73       14
+
+Current dice: [6, 6, 6, 2, 6] | rolls left: 0
+
+Score actions:
+  s01: twos (2 pts)
+  s02: threes (0 pts)
+  s03: fours (0 pts)
+  s04: fives (0 pts)
+  s05: sixes (24 pts)
+  s06: three_of_a_kind (26 pts)
+  s07: four_of_a_kind (26 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (26 pts)
+
+Choose action (h00-h31, s00-s12, or q): s07
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      99       14
+
+Current dice: [1, 1, 3, 4, 2] | rolls left: 2
+
+Agent chooses: keep 1 4
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       --
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      99       14
+
+Current dice: [1, 4, 3, 4, 4] | rolls left: 1
+
+Agent chooses: score fours
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      99       26
+
+Current dice: [6, 6, 2, 5, 2] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 6
+  h03: keep 6 6
+  h04: keep 2
+  h05: keep 6 2
+  h06: keep 6 2
+  h07: keep 6 6 2
+  h08: keep 5
+  h09: keep 6 5
+  h10: keep 6 5
+  h11: keep 6 6 5
+  h12: keep 2 5
+  h13: keep 6 2 5
+  h14: keep 6 2 5
+  h15: keep 6 6 2 5
+  h16: keep 2
+  h17: keep 6 2
+  h18: keep 6 2
+  h19: keep 6 6 2
+  h20: keep 2 2
+  h21: keep 6 2 2
+  h22: keep 6 2 2
+  h23: keep 6 6 2 2
+  h24: keep 5 2
+  h25: keep 6 5 2
+  h26: keep 6 5 2
+  h27: keep 6 6 5 2
+  h28: keep 2 5 2
+  h29: keep 6 2 5 2
+  h30: keep 6 2 5 2
+  h31: keep 6 6 2 5 2
+
+Score actions:
+  s01: twos (4 pts)
+  s02: threes (0 pts)
+  s03: fours (0 pts)
+  s04: fives (5 pts)
+  s05: sixes (12 pts)
+  s06: three_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (21 pts)
+
+Choose action (h00-h31, s00-s12, or q): h03
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      99       26
+
+Current dice: [6, 6, 5, 5, 2] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 6
+  h03: keep 6 6
+  h04: keep 5
+  h05: keep 6 5
+  h06: keep 6 5
+  h07: keep 6 6 5
+  h08: keep 5
+  h09: keep 6 5
+  h10: keep 6 5
+  h11: keep 6 6 5
+  h12: keep 5 5
+  h13: keep 6 5 5
+  h14: keep 6 5 5
+  h15: keep 6 6 5 5
+  h16: keep 2
+  h17: keep 6 2
+  h18: keep 6 2
+  h19: keep 6 6 2
+  h20: keep 5 2
+  h21: keep 6 5 2
+  h22: keep 6 5 2
+  h23: keep 6 6 5 2
+  h24: keep 5 2
+  h25: keep 6 5 2
+  h26: keep 6 5 2
+  h27: keep 6 6 5 2
+  h28: keep 5 5 2
+  h29: keep 6 5 5 2
+  h30: keep 6 5 5 2
+  h31: keep 6 6 5 5 2
+
+Score actions:
+  s01: twos (2 pts)
+  s02: threes (0 pts)
+  s03: fours (0 pts)
+  s04: fives (10 pts)
+  s05: sixes (12 pts)
+  s06: three_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (24 pts)
+
+Choose action (h00-h31, s00-s12, or q): h03
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     --       --
+------------------------------------------------
+Total                      99       26
+
+Current dice: [6, 6, 5, 5, 1] | rolls left: 0
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s03: fours (0 pts)
+  s04: fives (10 pts)
+  s05: sixes (12 pts)
+  s06: three_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+  s12: chance (23 pts)
+
+Choose action (h00-h31, s00-s12, or q): s12
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     122       26
+
+Current dice: [4, 2, 5, 6, 4] | rolls left: 2
+
+Agent chooses: keep 5 6
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     122       26
+
+Current dice: [1, 1, 5, 6, 6] | rolls left: 1
+
+Agent chooses: keep 5 6 6
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       --
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     122       26
+
+Current dice: [6, 6, 5, 6, 6] | rolls left: 0
+
+Agent chooses: score sixes
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     122       50
+
+Current dice: [4, 3, 4, 1, 4] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 4
+  h02: keep 3
+  h03: keep 4 3
+  h04: keep 4
+  h05: keep 4 4
+  h06: keep 3 4
+  h07: keep 4 3 4
+  h08: keep 1
+  h09: keep 4 1
+  h10: keep 3 1
+  h11: keep 4 3 1
+  h12: keep 4 1
+  h13: keep 4 4 1
+  h14: keep 3 4 1
+  h15: keep 4 3 4 1
+  h16: keep 4
+  h17: keep 4 4
+  h18: keep 3 4
+  h19: keep 4 3 4
+  h20: keep 4 4
+  h21: keep 4 4 4
+  h22: keep 3 4 4
+  h23: keep 4 3 4 4
+  h24: keep 1 4
+  h25: keep 4 1 4
+  h26: keep 3 1 4
+  h27: keep 4 3 1 4
+  h28: keep 4 1 4
+  h29: keep 4 4 1 4
+  h30: keep 3 4 1 4
+  h31: keep 4 3 4 1 4
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s03: fours (12 pts)
+  s04: fives (0 pts)
+  s05: sixes (0 pts)
+  s06: three_of_a_kind (16 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h21
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     122       50
+
+Current dice: [4, 1, 4, 4, 4] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 4
+  h02: keep 1
+  h03: keep 4 1
+  h04: keep 4
+  h05: keep 4 4
+  h06: keep 1 4
+  h07: keep 4 1 4
+  h08: keep 4
+  h09: keep 4 4
+  h10: keep 1 4
+  h11: keep 4 1 4
+  h12: keep 4 4
+  h13: keep 4 4 4
+  h14: keep 1 4 4
+  h15: keep 4 1 4 4
+  h16: keep 4
+  h17: keep 4 4
+  h18: keep 1 4
+  h19: keep 4 1 4
+  h20: keep 4 4
+  h21: keep 4 4 4
+  h22: keep 1 4 4
+  h23: keep 4 1 4 4
+  h24: keep 4 4
+  h25: keep 4 4 4
+  h26: keep 1 4 4
+  h27: keep 4 1 4 4
+  h28: keep 4 4 4
+  h29: keep 4 4 4 4
+  h30: keep 1 4 4 4
+  h31: keep 4 1 4 4 4
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s03: fours (16 pts)
+  s04: fives (0 pts)
+  s05: sixes (0 pts)
+  s06: three_of_a_kind (17 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h29
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      --       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     122       50
+
+Current dice: [4, 1, 4, 4, 4] | rolls left: 0
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s03: fours (16 pts)
+  s04: fives (0 pts)
+  s05: sixes (0 pts)
+  s06: three_of_a_kind (17 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): s03
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     138       50
+
+Current dice: [4, 3, 5, 1, 4] | rolls left: 2
+
+Agent chooses: keep 4 3 1
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     138       50
+
+Current dice: [4, 3, 4, 1, 1] | rolls left: 1
+
+Agent chooses: keep 4
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       --
+------------------------------------------------
+Total                     138       50
+
+Current dice: [4, 3, 6, 3, 3] | rolls left: 0
+
+Agent chooses: score chance
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     138       69
+
+Current dice: [5, 5, 6, 6, 1] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 5
+  h02: keep 5
+  h03: keep 5 5
+  h04: keep 6
+  h05: keep 5 6
+  h06: keep 5 6
+  h07: keep 5 5 6
+  h08: keep 6
+  h09: keep 5 6
+  h10: keep 5 6
+  h11: keep 5 5 6
+  h12: keep 6 6
+  h13: keep 5 6 6
+  h14: keep 5 6 6
+  h15: keep 5 5 6 6
+  h16: keep 1
+  h17: keep 5 1
+  h18: keep 5 1
+  h19: keep 5 5 1
+  h20: keep 6 1
+  h21: keep 5 6 1
+  h22: keep 5 6 1
+  h23: keep 5 5 6 1
+  h24: keep 6 1
+  h25: keep 5 6 1
+  h26: keep 5 6 1
+  h27: keep 5 5 6 1
+  h28: keep 6 6 1
+  h29: keep 5 6 6 1
+  h30: keep 5 6 6 1
+  h31: keep 5 5 6 6 1
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s04: fives (10 pts)
+  s05: sixes (12 pts)
+  s06: three_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h12
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     138       69
+
+Current dice: [6, 1, 6, 6, 4] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 1
+  h03: keep 6 1
+  h04: keep 6
+  h05: keep 6 6
+  h06: keep 1 6
+  h07: keep 6 1 6
+  h08: keep 6
+  h09: keep 6 6
+  h10: keep 1 6
+  h11: keep 6 1 6
+  h12: keep 6 6
+  h13: keep 6 6 6
+  h14: keep 1 6 6
+  h15: keep 6 1 6 6
+  h16: keep 4
+  h17: keep 6 4
+  h18: keep 1 4
+  h19: keep 6 1 4
+  h20: keep 6 4
+  h21: keep 6 6 4
+  h22: keep 1 6 4
+  h23: keep 6 1 6 4
+  h24: keep 6 4
+  h25: keep 6 6 4
+  h26: keep 1 6 4
+  h27: keep 6 1 6 4
+  h28: keep 6 6 4
+  h29: keep 6 6 6 4
+  h30: keep 1 6 6 4
+  h31: keep 6 1 6 6 4
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s04: fives (0 pts)
+  s05: sixes (18 pts)
+  s06: three_of_a_kind (23 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h12
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      --       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     138       69
+
+Current dice: [5, 4, 6, 6, 1] | rolls left: 0
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s04: fives (5 pts)
+  s05: sixes (12 pts)
+  s06: three_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): s05
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      12       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       --
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     150       69
+
+Current dice: [5, 3, 4, 6, 2] | rolls left: 2
+
+Agent chooses: score large_straight
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      12       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     150      109
+
+Current dice: [6, 6, 5, 4, 1] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 6
+  h03: keep 6 6
+  h04: keep 5
+  h05: keep 6 5
+  h06: keep 6 5
+  h07: keep 6 6 5
+  h08: keep 4
+  h09: keep 6 4
+  h10: keep 6 4
+  h11: keep 6 6 4
+  h12: keep 5 4
+  h13: keep 6 5 4
+  h14: keep 6 5 4
+  h15: keep 6 6 5 4
+  h16: keep 1
+  h17: keep 6 1
+  h18: keep 6 1
+  h19: keep 6 6 1
+  h20: keep 5 1
+  h21: keep 6 5 1
+  h22: keep 6 5 1
+  h23: keep 6 6 5 1
+  h24: keep 4 1
+  h25: keep 6 4 1
+  h26: keep 6 4 1
+  h27: keep 6 6 4 1
+  h28: keep 5 4 1
+  h29: keep 6 5 4 1
+  h30: keep 6 5 4 1
+  h31: keep 6 6 5 4 1
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s04: fives (5 pts)
+  s06: three_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h03
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      12       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     150      109
+
+Current dice: [6, 6, 1, 2, 4] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 6
+  h03: keep 6 6
+  h04: keep 1
+  h05: keep 6 1
+  h06: keep 6 1
+  h07: keep 6 6 1
+  h08: keep 2
+  h09: keep 6 2
+  h10: keep 6 2
+  h11: keep 6 6 2
+  h12: keep 1 2
+  h13: keep 6 1 2
+  h14: keep 6 1 2
+  h15: keep 6 6 1 2
+  h16: keep 4
+  h17: keep 6 4
+  h18: keep 6 4
+  h19: keep 6 6 4
+  h20: keep 1 4
+  h21: keep 6 1 4
+  h22: keep 6 1 4
+  h23: keep 6 6 1 4
+  h24: keep 2 4
+  h25: keep 6 2 4
+  h26: keep 6 2 4
+  h27: keep 6 6 2 4
+  h28: keep 1 2 4
+  h29: keep 6 1 2 4
+  h30: keep 6 1 2 4
+  h31: keep 6 6 1 2 4
+
+Score actions:
+  s01: twos (2 pts)
+  s02: threes (0 pts)
+  s04: fives (0 pts)
+  s06: three_of_a_kind (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h03
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      12       24
+three_of_a_kind            --       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     150      109
+
+Current dice: [6, 6, 3, 1, 6] | rolls left: 0
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s04: fives (0 pts)
+  s06: three_of_a_kind (22 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): s06
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     172      109
+
+Current dice: [1, 6, 5, 2, 2] | rolls left: 2
+
+Agent chooses: keep 1 6 5
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     172      109
+
+Current dice: [1, 6, 5, 2, 2] | rolls left: 1
+
+Agent chooses: keep 6 5 2
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       --
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     172      109
+
+Current dice: [5, 6, 5, 5, 2] | rolls left: 0
+
+Agent chooses: score fives
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     172      159
+
+Current dice: [3, 3, 5, 1, 5] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 3
+  h02: keep 3
+  h03: keep 3 3
+  h04: keep 5
+  h05: keep 3 5
+  h06: keep 3 5
+  h07: keep 3 3 5
+  h08: keep 1
+  h09: keep 3 1
+  h10: keep 3 1
+  h11: keep 3 3 1
+  h12: keep 5 1
+  h13: keep 3 5 1
+  h14: keep 3 5 1
+  h15: keep 3 3 5 1
+  h16: keep 5
+  h17: keep 3 5
+  h18: keep 3 5
+  h19: keep 3 3 5
+  h20: keep 5 5
+  h21: keep 3 5 5
+  h22: keep 3 5 5
+  h23: keep 3 3 5 5
+  h24: keep 1 5
+  h25: keep 3 1 5
+  h26: keep 3 1 5
+  h27: keep 3 3 1 5
+  h28: keep 5 1 5
+  h29: keep 3 5 1 5
+  h30: keep 3 5 1 5
+  h31: keep 3 3 5 1 5
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (6 pts)
+  s04: fives (10 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h20
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     172      159
+
+Current dice: [5, 3, 5, 1, 5] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 5
+  h02: keep 3
+  h03: keep 5 3
+  h04: keep 5
+  h05: keep 5 5
+  h06: keep 3 5
+  h07: keep 5 3 5
+  h08: keep 1
+  h09: keep 5 1
+  h10: keep 3 1
+  h11: keep 5 3 1
+  h12: keep 5 1
+  h13: keep 5 5 1
+  h14: keep 3 5 1
+  h15: keep 5 3 5 1
+  h16: keep 5
+  h17: keep 5 5
+  h18: keep 3 5
+  h19: keep 5 3 5
+  h20: keep 5 5
+  h21: keep 5 5 5
+  h22: keep 3 5 5
+  h23: keep 5 3 5 5
+  h24: keep 1 5
+  h25: keep 5 1 5
+  h26: keep 3 1 5
+  h27: keep 5 3 1 5
+  h28: keep 5 1 5
+  h29: keep 5 5 1 5
+  h30: keep 3 5 1 5
+  h31: keep 5 3 5 1 5
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s04: fives (15 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h21
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      --       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     172      159
+
+Current dice: [5, 3, 5, 1, 5] | rolls left: 0
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s04: fives (15 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): s04
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       --
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     187      159
+
+Current dice: [6, 4, 6, 4, 4] | rolls left: 2
+
+Agent chooses: score full_house
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     187      184
+
+Current dice: [4, 5, 6, 5, 4] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 4
+  h02: keep 5
+  h03: keep 4 5
+  h04: keep 6
+  h05: keep 4 6
+  h06: keep 5 6
+  h07: keep 4 5 6
+  h08: keep 5
+  h09: keep 4 5
+  h10: keep 5 5
+  h11: keep 4 5 5
+  h12: keep 6 5
+  h13: keep 4 6 5
+  h14: keep 5 6 5
+  h15: keep 4 5 6 5
+  h16: keep 4
+  h17: keep 4 4
+  h18: keep 5 4
+  h19: keep 4 5 4
+  h20: keep 6 4
+  h21: keep 4 6 4
+  h22: keep 5 6 4
+  h23: keep 4 5 6 4
+  h24: keep 5 4
+  h25: keep 4 5 4
+  h26: keep 5 5 4
+  h27: keep 4 5 5 4
+  h28: keep 6 5 4
+  h29: keep 4 6 5 4
+  h30: keep 5 6 5 4
+  h31: keep 4 5 6 5 4
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (0 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h27
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     187      184
+
+Current dice: [4, 5, 3, 5, 4] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 4
+  h02: keep 5
+  h03: keep 4 5
+  h04: keep 3
+  h05: keep 4 3
+  h06: keep 5 3
+  h07: keep 4 5 3
+  h08: keep 5
+  h09: keep 4 5
+  h10: keep 5 5
+  h11: keep 4 5 5
+  h12: keep 3 5
+  h13: keep 4 3 5
+  h14: keep 5 3 5
+  h15: keep 4 5 3 5
+  h16: keep 4
+  h17: keep 4 4
+  h18: keep 5 4
+  h19: keep 4 5 4
+  h20: keep 3 4
+  h21: keep 4 3 4
+  h22: keep 5 3 4
+  h23: keep 4 5 3 4
+  h24: keep 5 4
+  h25: keep 4 5 4
+  h26: keep 5 5 4
+  h27: keep 4 5 5 4
+  h28: keep 3 5 4
+  h29: keep 4 3 5 4
+  h30: keep 5 3 5 4
+  h31: keep 4 5 3 5 4
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h27
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       --
+large_straight             40       40
+yahtzee                    --       --
+chance                     23       19
+------------------------------------------------
+Total                     187      184
+
+Current dice: [4, 5, 3, 5, 4] | rolls left: 0
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (3 pts)
+  s08: full_house (0 pts)
+  s11: yahtzee (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): s11
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       --
+large_straight             40       40
+yahtzee                     0       --
+chance                     23       19
+------------------------------------------------
+Total                     187      184
+
+Current dice: [6, 3, 5, 5, 4] | rolls left: 2
+
+Agent chooses: score small_straight
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0       --
+chance                     23       19
+------------------------------------------------
+Total                     187      214
+
+Current dice: [1, 3, 1, 2, 6] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 1
+  h02: keep 3
+  h03: keep 1 3
+  h04: keep 1
+  h05: keep 1 1
+  h06: keep 3 1
+  h07: keep 1 3 1
+  h08: keep 2
+  h09: keep 1 2
+  h10: keep 3 2
+  h11: keep 1 3 2
+  h12: keep 1 2
+  h13: keep 1 1 2
+  h14: keep 3 1 2
+  h15: keep 1 3 1 2
+  h16: keep 6
+  h17: keep 1 6
+  h18: keep 3 6
+  h19: keep 1 3 6
+  h20: keep 1 6
+  h21: keep 1 1 6
+  h22: keep 3 1 6
+  h23: keep 1 3 1 6
+  h24: keep 2 6
+  h25: keep 1 2 6
+  h26: keep 3 2 6
+  h27: keep 1 3 2 6
+  h28: keep 1 2 6
+  h29: keep 1 1 2 6
+  h30: keep 3 1 2 6
+  h31: keep 1 3 1 2 6
+
+Score actions:
+  s01: twos (2 pts)
+  s02: threes (3 pts)
+  s08: full_house (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h02
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0       --
+chance                     23       19
+------------------------------------------------
+Total                     187      214
+
+Current dice: [2, 3, 1, 3, 3] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 2
+  h02: keep 3
+  h03: keep 2 3
+  h04: keep 1
+  h05: keep 2 1
+  h06: keep 3 1
+  h07: keep 2 3 1
+  h08: keep 3
+  h09: keep 2 3
+  h10: keep 3 3
+  h11: keep 2 3 3
+  h12: keep 1 3
+  h13: keep 2 1 3
+  h14: keep 3 1 3
+  h15: keep 2 3 1 3
+  h16: keep 3
+  h17: keep 2 3
+  h18: keep 3 3
+  h19: keep 2 3 3
+  h20: keep 1 3
+  h21: keep 2 1 3
+  h22: keep 3 1 3
+  h23: keep 2 3 1 3
+  h24: keep 3 3
+  h25: keep 2 3 3
+  h26: keep 3 3 3
+  h27: keep 2 3 3 3
+  h28: keep 1 3 3
+  h29: keep 2 1 3 3
+  h30: keep 3 1 3 3
+  h31: keep 2 3 1 3 3
+
+Score actions:
+  s01: twos (2 pts)
+  s02: threes (9 pts)
+  s08: full_house (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h26
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                     --        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0       --
+chance                     23       19
+------------------------------------------------
+Total                     187      214
+
+Current dice: [1, 3, 5, 3, 3] | rolls left: 0
+
+Score actions:
+  s01: twos (0 pts)
+  s02: threes (9 pts)
+  s08: full_house (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): s02
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0       --
+chance                     23       19
+------------------------------------------------
+Total                     196      214
+
+Current dice: [3, 6, 5, 2, 2] | rolls left: 2
+
+Agent chooses: keep 6 5 2
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0       --
+chance                     23       19
+------------------------------------------------
+Total                     196      214
+
+Current dice: [4, 6, 5, 5, 2] | rolls left: 1
+
+Agent chooses: keep 4 6 5
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0       --
+chance                     23       19
+------------------------------------------------
+Total                     196      214
+
+Current dice: [4, 6, 5, 3, 5] | rolls left: 0
+
+Agent chooses: score yahtzee
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     196      214
+
+Current dice: [6, 2, 5, 6, 5] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 2
+  h03: keep 6 2
+  h04: keep 5
+  h05: keep 6 5
+  h06: keep 2 5
+  h07: keep 6 2 5
+  h08: keep 6
+  h09: keep 6 6
+  h10: keep 2 6
+  h11: keep 6 2 6
+  h12: keep 5 6
+  h13: keep 6 5 6
+  h14: keep 2 5 6
+  h15: keep 6 2 5 6
+  h16: keep 5
+  h17: keep 6 5
+  h18: keep 2 5
+  h19: keep 6 2 5
+  h20: keep 5 5
+  h21: keep 6 5 5
+  h22: keep 2 5 5
+  h23: keep 6 2 5 5
+  h24: keep 6 5
+  h25: keep 6 6 5
+  h26: keep 2 6 5
+  h27: keep 6 2 6 5
+  h28: keep 5 6 5
+  h29: keep 6 5 6 5
+  h30: keep 2 5 6 5
+  h31: keep 6 2 5 6 5
+
+Score actions:
+  s01: twos (2 pts)
+  s08: full_house (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h29
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 --       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     196      214
+
+Current dice: [6, 6, 5, 6, 5] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 6
+  h02: keep 6
+  h03: keep 6 6
+  h04: keep 5
+  h05: keep 6 5
+  h06: keep 6 5
+  h07: keep 6 6 5
+  h08: keep 6
+  h09: keep 6 6
+  h10: keep 6 6
+  h11: keep 6 6 6
+  h12: keep 5 6
+  h13: keep 6 5 6
+  h14: keep 6 5 6
+  h15: keep 6 6 5 6
+  h16: keep 5
+  h17: keep 6 5
+  h18: keep 6 5
+  h19: keep 6 6 5
+  h20: keep 5 5
+  h21: keep 6 5 5
+  h22: keep 6 5 5
+  h23: keep 6 6 5 5
+  h24: keep 6 5
+  h25: keep 6 6 5
+  h26: keep 6 6 5
+  h27: keep 6 6 6 5
+  h28: keep 5 6 5
+  h29: keep 6 5 6 5
+  h30: keep 6 5 6 5
+  h31: keep 6 6 5 6 5
+
+Score actions:
+  s01: twos (0 pts)
+  s08: full_house (25 pts)
+
+Choose action (h00-h31, s00-s12, or q): s08
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     221      214
+
+Current dice: [4, 5, 1, 4, 2] | rolls left: 2
+
+Agent chooses: keep 4 5
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     221      214
+
+Current dice: [4, 5, 4, 1, 3] | rolls left: 1
+
+Agent chooses: keep 4 5 4
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26       --
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     221      214
+
+Current dice: [4, 5, 4, 4, 6] | rolls left: 0
+
+Agent chooses: score four_of_a_kind
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26        0
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     221      214
+
+Current dice: [1, 4, 1, 6, 6] | rolls left: 2
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 1
+  h02: keep 4
+  h03: keep 1 4
+  h04: keep 1
+  h05: keep 1 1
+  h06: keep 4 1
+  h07: keep 1 4 1
+  h08: keep 6
+  h09: keep 1 6
+  h10: keep 4 6
+  h11: keep 1 4 6
+  h12: keep 1 6
+  h13: keep 1 1 6
+  h14: keep 4 1 6
+  h15: keep 1 4 1 6
+  h16: keep 6
+  h17: keep 1 6
+  h18: keep 4 6
+  h19: keep 1 4 6
+  h20: keep 1 6
+  h21: keep 1 1 6
+  h22: keep 4 1 6
+  h23: keep 1 4 1 6
+  h24: keep 6 6
+  h25: keep 1 6 6
+  h26: keep 4 6 6
+  h27: keep 1 4 6 6
+  h28: keep 1 6 6
+  h29: keep 1 1 6 6
+  h30: keep 4 1 6 6
+  h31: keep 1 4 1 6 6
+
+Score actions:
+  s01: twos (0 pts)
+
+Choose action (h00-h31, s00-s12, or q): h00
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26        0
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     221      214
+
+Current dice: [2, 3, 5, 2, 1] | rolls left: 1
+
+Reroll actions:
+  h00: reroll all dice
+  h01: keep 2
+  h02: keep 3
+  h03: keep 2 3
+  h04: keep 5
+  h05: keep 2 5
+  h06: keep 3 5
+  h07: keep 2 3 5
+  h08: keep 2
+  h09: keep 2 2
+  h10: keep 3 2
+  h11: keep 2 3 2
+  h12: keep 5 2
+  h13: keep 2 5 2
+  h14: keep 3 5 2
+  h15: keep 2 3 5 2
+  h16: keep 1
+  h17: keep 2 1
+  h18: keep 3 1
+  h19: keep 2 3 1
+  h20: keep 5 1
+  h21: keep 2 5 1
+  h22: keep 3 5 1
+  h23: keep 2 3 5 1
+  h24: keep 2 1
+  h25: keep 2 2 1
+  h26: keep 3 2 1
+  h27: keep 2 3 2 1
+  h28: keep 5 2 1
+  h29: keep 2 5 2 1
+  h30: keep 3 5 2 1
+  h31: keep 2 3 5 2 1
+
+Score actions:
+  s01: twos (4 pts)
+
+Choose action (h00-h31, s00-s12, or q): h09
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                       --        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26        0
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     221      214
+
+Current dice: [2, 1, 1, 2, 1] | rolls left: 0
+
+Score actions:
+  s01: twos (4 pts)
+
+Choose action (h00-h31, s00-s12, or q): s01
+Scored. Reward from actor perspective: 0
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                        4        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26        0
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     225      214
+
+Current dice: [2, 3, 4, 1, 3] | rolls left: 2
+
+Agent chooses: keep 3 4 3
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                        4        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26        0
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     225      214
+
+Current dice: [4, 3, 4, 2, 3] | rolls left: 1
+
+Agent chooses: keep 4 4
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                        4        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22       --
+four_of_a_kind             26        0
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     225      214
+
+Current dice: [4, 5, 4, 1, 3] | rolls left: 0
+
+Agent chooses: score three_of_a_kind
+Scored. Reward from actor perspective: -1
+
+Scorecard
+------------------------------------------------
+Category                  You    Agent
+ones                        3        1
+twos                        4        4
+threes                      9        9
+fours                      16       12
+fives                      15       15
+sixes                      12       24
+three_of_a_kind            22        0
+four_of_a_kind             26        0
+full_house                 25       25
+small_straight             30       30
+large_straight             40       40
+yahtzee                     0        0
+chance                     23       19
+------------------------------------------------
+Total                     225      214
+
+You win.

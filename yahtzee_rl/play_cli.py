@@ -9,6 +9,7 @@ import jax
 import jax.numpy as jnp
 
 from yahtzee_rl import constants as c
+from yahtzee_rl.actions import action_label
 from yahtzee_rl.env import EnvState, legal_action_mask, observation, reset, step
 from yahtzee_rl.mcts import search_policy
 from yahtzee_rl.model import YahtzeeActorCritic, masked_logits
@@ -40,14 +41,6 @@ def print_scoreboard(state: EnvState) -> None:
     print(f"{'Total':20} {int(totals[0]):>8} {int(totals[1]):>8}")
 
 
-def hold_mask_label(action: int, dice: list[int]) -> str:
-    if action == 0:
-        return "reroll all dice"
-    mask = [(action >> i) & 1 for i in range(c.NUM_DICE)]
-    kept = [str(die) for die, keep in zip(dice, mask) if keep]
-    return "keep " + " ".join(kept)
-
-
 def legal_human_actions(state: EnvState) -> list[int]:
     mask = jax.device_get(legal_action_mask(state)[0])
     return [idx for idx, legal in enumerate(mask.tolist()) if legal]
@@ -62,13 +55,12 @@ def print_human_options(state: EnvState) -> None:
         print("\nReroll actions:")
         for action in legal:
             if action < c.NUM_HOLD_ACTIONS:
-                print(f"  h{action:02d}: {hold_mask_label(action, dice)}")
+                print(f"  {action_label(action, dice)}")
 
     print("\nScore actions:")
     for action in legal:
         if action >= c.NUM_HOLD_ACTIONS:
-            category = action - c.NUM_HOLD_ACTIONS
-            print(f"  s{category:02d}: {c.CATEGORY_NAMES[category]} ({scores[category]} pts)")
+            print(f"  {action_label(action, dice, scores)}")
 
 
 def parse_human_action(raw: str) -> int | None:
@@ -110,11 +102,50 @@ def agent_action(model, params, state: EnvState, key: jax.Array, num_simulations
     return _scalar(jnp.argmax(logits, axis=-1)[0])
 
 
+def agent_debug_lines(
+    model,
+    params,
+    state: EnvState,
+    key: jax.Array,
+    num_simulations: int,
+    use_mcts: bool,
+    top_k: int,
+) -> tuple[int, list[str]]:
+    logits, value = model.apply(params, observation(state))
+    masked = masked_logits(logits, legal_action_mask(state))
+    prior = jax.nn.softmax(masked, axis=-1)
+
+    if use_mcts:
+        policy = search_policy(model, params, state, key, num_simulations=num_simulations)
+        weights = policy.action_weights
+        action = _scalar(policy.action[0])
+    else:
+        weights = prior
+        action = _scalar(jnp.argmax(masked, axis=-1)[0])
+
+    dice = jax.device_get(state.dice[0]).tolist()
+    scores = jax.device_get(score_categories(state.dice)[0]).tolist()
+    legal = jax.device_get(legal_action_mask(state)[0]).tolist()
+    prior_values = jax.device_get(prior[0]).tolist()
+    weight_values = jax.device_get(weights[0]).tolist()
+    order = sorted(range(c.NUM_ACTIONS), key=lambda idx: weight_values[idx], reverse=True)
+    order = order[: max(top_k, 1)]
+    weight_label = "mcts" if use_mcts else "weight"
+
+    lines = [f"Agent value estimate: {float(jax.device_get(value[0])):+.3f}"]
+    lines.append("Agent top actions:")
+    for rank, idx in enumerate(order, start=1):
+        score = "" if idx < c.NUM_HOLD_ACTIONS else f" immediate={scores[idx - c.NUM_HOLD_ACTIONS]}"
+        lines.append(
+            f"  {rank}. {action_label(idx, dice, scores):35} "
+            f"{weight_label}={weight_values[idx]:.3f} prior={prior_values[idx]:.3f} "
+            f"legal={bool(legal[idx])}{score}"
+        )
+    return action, lines
+
+
 def describe_action(action: int, dice: list[int]) -> str:
-    if action < c.NUM_HOLD_ACTIONS:
-        return hold_mask_label(action, dice)
-    category = action - c.NUM_HOLD_ACTIONS
-    return f"score {c.CATEGORY_NAMES[category]}"
+    return action_label(action, dice)
 
 
 def load_or_init_agent(checkpoint: str | None, hidden_dim: int):
@@ -148,14 +179,26 @@ def play(args) -> None:
             else:
                 key, agent_key = jax.random.split(key)
                 agent_state = _state_for_player(state, 1)
-                action = agent_action(
-                    model,
-                    {"params": params},
-                    agent_state,
-                    agent_key,
-                    args.num_simulations,
-                    not args.no_mcts,
-                )
+                if args.debug_agent:
+                    action, debug_lines = agent_debug_lines(
+                        model,
+                        {"params": params},
+                        agent_state,
+                        agent_key,
+                        args.num_simulations,
+                        not args.no_mcts,
+                        args.top_k,
+                    )
+                    print("\n" + "\n".join(debug_lines))
+                else:
+                    action = agent_action(
+                        model,
+                        {"params": params},
+                        agent_state,
+                        agent_key,
+                        args.num_simulations,
+                        not args.no_mcts,
+                    )
                 print(f"\nAgent chooses: {describe_action(action, dice)}")
 
             key, step_key = jax.random.split(key)
@@ -184,6 +227,8 @@ def parse_args():
     parser.add_argument("--hidden-dim", type=int, default=256, help="Hidden dim for untrained agent fallback.")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--no-mcts", action="store_true", help="Use greedy network logits instead of MCTS.")
+    parser.add_argument("--debug-agent", action="store_true", help="Print top-k MCTS/prior diagnostics for agent turns.")
+    parser.add_argument("--top-k", type=int, default=5, help="Number of debug candidate actions to print.")
     return parser.parse_args()
 
 
