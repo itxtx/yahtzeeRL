@@ -19,6 +19,7 @@ from tqdm import trange
 import yahtzee_rl.constants as c
 from yahtzee_rl.env import observation, reset
 from yahtzee_rl.model import YahtzeeActorCritic
+from yahtzee_rl.rewards import REWARD_MODES, WIN_LOSS_MARGIN
 from yahtzee_rl.self_play import generate_self_play, trajectory_observation
 
 
@@ -35,6 +36,9 @@ class TrainConfig:
     checkpoint_dir: str = "checkpoints"
     checkpoint_every: int = 100
     log_every: int = 10
+    reward_mode: str = WIN_LOSS_MARGIN
+    margin_weight: float = 0.25
+    margin_scale: float = 50.0
 
 
 class AgentState(train_state.TrainState):
@@ -88,6 +92,9 @@ def make_update_fn(model: YahtzeeActorCritic, config: TrainConfig):
             play_key,
             batch_size=config.batch_size,
             num_simulations=config.num_simulations,
+            reward_mode=config.reward_mode,
+            margin_weight=config.margin_weight,
+            margin_scale=config.margin_scale,
         )
         (loss, metrics), grads = jax.value_and_grad(loss_fn, has_aux=True)(
             state.params, trajectory
@@ -116,14 +123,26 @@ def latest_checkpoint(path: str | Path) -> Path:
     return candidates[-1]
 
 
-def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tuple[AgentState, YahtzeeActorCritic, int]:
+def resolve_checkpoint_path(path: str | Path) -> Path:
     path = Path(path).expanduser().resolve()
-    checkpoint_path = latest_checkpoint(path) if path.is_dir() and path.name.startswith("step_") is False else path
+    return latest_checkpoint(path) if path.is_dir() and path.name.startswith("step_") is False else path
+
+
+def load_checkpoint_config(path: str | Path) -> TrainConfig:
+    checkpoint_path = resolve_checkpoint_path(path)
     config_path = checkpoint_path.parent / "config.json"
-    if config is None and config_path.exists():
-        config = TrainConfig(**json.loads(config_path.read_text(encoding="utf-8")))
-    elif config is None:
-        config = TrainConfig(batch_size=1)
+    if config_path.exists():
+        raw_config = json.loads(config_path.read_text(encoding="utf-8"))
+        defaults = asdict(TrainConfig())
+        defaults.update(raw_config)
+        return TrainConfig(**defaults)
+    return TrainConfig(batch_size=1)
+
+
+def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tuple[AgentState, YahtzeeActorCritic, int]:
+    checkpoint_path = resolve_checkpoint_path(path)
+    if config is None:
+        config = load_checkpoint_config(checkpoint_path)
 
     state, model, _ = create_train_state(config)
     checkpointer = ocp.PyTreeCheckpointer()
@@ -155,7 +174,9 @@ def train(config: TrainConfig) -> AgentState:
                 "value={value_loss:.4f} entropy={entropy:.3f} "
                 "p0={mean_player0_score:.1f} p1={mean_player1_score:.1f} "
                 "p0w={player0_win_rate:.2f} p1w={player1_win_rate:.2f} "
-                "draw={draw_rate:.2f} ups={ups:.2f}".format(
+                "draw={draw_rate:.2f} margin={mean_score_margin_player0:.1f} "
+                "abs_margin={mean_abs_score_margin:.1f} shaped={mean_shaped_return:.3f} "
+                "ups={ups:.2f}".format(
                     step=step_idx, ups=steps_per_sec, **ready_metrics
                 )
             )
@@ -177,6 +198,9 @@ def parse_args() -> TrainConfig:
     parser.add_argument("--checkpoint-every", type=int, default=TrainConfig.checkpoint_every)
     parser.add_argument("--log-every", type=int, default=TrainConfig.log_every)
     parser.add_argument("--seed", type=int, default=TrainConfig.seed)
+    parser.add_argument("--reward-mode", choices=REWARD_MODES, default=TrainConfig.reward_mode)
+    parser.add_argument("--margin-weight", type=float, default=TrainConfig.margin_weight)
+    parser.add_argument("--margin-scale", type=float, default=TrainConfig.margin_scale)
     args = parser.parse_args()
     return TrainConfig(**vars(args))
 

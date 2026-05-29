@@ -21,6 +21,18 @@ Local Apple Silicon JAX runs on CPU, so use small settings locally:
 python -m yahtzee_rl.train --steps 2 --batch-size 2 --num-simulations 2
 ```
 
+Training defaults to margin-shaped terminal rewards:
+
+```text
+sign(score_margin) + 0.25 * tanh(score_margin / 50)
+```
+
+Use pure win/loss targets for comparison:
+
+```bash
+python -m yahtzee_rl.train --reward-mode win_loss
+```
+
 For GPU training, copy this repo to Google Drive and run:
 
 ```text
@@ -30,6 +42,11 @@ notebooks/colab_self_play.ipynb
 The notebook mounts Drive, installs the repo, verifies `jax.devices()`, and
 copies the repo to `/content/yahtzeeRL` for faster Colab execution while writing
 checkpoints back to Drive.
+
+The Colab notebook runs full training/evaluation through `python -m ...`
+subprocesses instead of `train(config)` inside the notebook kernel. This avoids
+keeping JAX's GPU allocator pool and compiled programs alive after training
+finishes.
 
 ## Play Against The Agent
 

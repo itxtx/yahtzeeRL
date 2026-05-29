@@ -31,6 +31,9 @@ def test_cli_agent_debug_formatter_without_mcts():
         num_simulations=1,
         use_mcts=False,
         top_k=3,
+        reward_mode="win_loss_margin",
+        margin_weight=0.25,
+        margin_scale=50.0,
     )
 
     assert 0 <= action < 45

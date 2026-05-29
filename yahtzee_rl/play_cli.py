@@ -14,7 +14,7 @@ from yahtzee_rl.env import EnvState, legal_action_mask, observation, reset, step
 from yahtzee_rl.mcts import search_policy
 from yahtzee_rl.model import YahtzeeActorCritic, masked_logits
 from yahtzee_rl.scoring import score_categories, total_score
-from yahtzee_rl.train import TrainConfig, create_train_state, load_checkpoint
+from yahtzee_rl.train import TrainConfig, create_train_state, load_checkpoint, load_checkpoint_config
 
 
 def _scalar(x) -> int:
@@ -92,9 +92,28 @@ def ask_human_action(state: EnvState) -> int:
         print("That action is not legal here.")
 
 
-def agent_action(model, params, state: EnvState, key: jax.Array, num_simulations: int, use_mcts: bool) -> int:
+def agent_action(
+    model,
+    params,
+    state: EnvState,
+    key: jax.Array,
+    num_simulations: int,
+    use_mcts: bool,
+    reward_mode: str,
+    margin_weight: float,
+    margin_scale: float,
+) -> int:
     if use_mcts:
-        policy = search_policy(model, params, state, key, num_simulations=num_simulations)
+        policy = search_policy(
+            model,
+            params,
+            state,
+            key,
+            num_simulations=num_simulations,
+            reward_mode=reward_mode,
+            margin_weight=margin_weight,
+            margin_scale=margin_scale,
+        )
         return _scalar(policy.action[0])
 
     logits, _ = model.apply(params, observation(state))
@@ -110,13 +129,25 @@ def agent_debug_lines(
     num_simulations: int,
     use_mcts: bool,
     top_k: int,
+    reward_mode: str,
+    margin_weight: float,
+    margin_scale: float,
 ) -> tuple[int, list[str]]:
     logits, value = model.apply(params, observation(state))
     masked = masked_logits(logits, legal_action_mask(state))
     prior = jax.nn.softmax(masked, axis=-1)
 
     if use_mcts:
-        policy = search_policy(model, params, state, key, num_simulations=num_simulations)
+        policy = search_policy(
+            model,
+            params,
+            state,
+            key,
+            num_simulations=num_simulations,
+            reward_mode=reward_mode,
+            margin_weight=margin_weight,
+            margin_scale=margin_scale,
+        )
         weights = policy.action_weights
         action = _scalar(policy.action[0])
     else:
@@ -150,18 +181,19 @@ def describe_action(action: int, dice: list[int]) -> str:
 
 def load_or_init_agent(checkpoint: str | None, hidden_dim: int):
     if checkpoint:
+        config = load_checkpoint_config(checkpoint)
         state, model, step_idx = load_checkpoint(checkpoint)
         print(f"Loaded checkpoint step {step_idx} from {Path(checkpoint).expanduser()}")
-        return state.params, model
+        return state.params, model, config
 
     config = TrainConfig(batch_size=1, hidden_dim=hidden_dim)
     state, model, _ = create_train_state(config)
     print("No checkpoint supplied; using an untrained network.")
-    return state.params, model
+    return state.params, model, config
 
 
 def play(args) -> None:
-    params, model = load_or_init_agent(args.checkpoint, args.hidden_dim)
+    params, model, config = load_or_init_agent(args.checkpoint, args.hidden_dim)
     key = jax.random.PRNGKey(args.seed)
     key, reset_key = jax.random.split(key)
     state = reset(reset_key, batch_size=1)
@@ -188,6 +220,9 @@ def play(args) -> None:
                         args.num_simulations,
                         not args.no_mcts,
                         args.top_k,
+                        config.reward_mode,
+                        config.margin_weight,
+                        config.margin_scale,
                     )
                     print("\n" + "\n".join(debug_lines))
                 else:
@@ -198,6 +233,9 @@ def play(args) -> None:
                         agent_key,
                         args.num_simulations,
                         not args.no_mcts,
+                        config.reward_mode,
+                        config.margin_weight,
+                        config.margin_scale,
                     )
                 print(f"\nAgent chooses: {describe_action(action, dice)}")
 

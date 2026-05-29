@@ -10,6 +10,7 @@ import jax.numpy as jnp
 import yahtzee_rl.constants as c
 from yahtzee_rl.env import EnvState, observation, reset, step
 from yahtzee_rl.mcts import search_policy
+from yahtzee_rl.rewards import WIN_LOSS_MARGIN, terminal_values_from_scores
 from yahtzee_rl.scoring import total_score
 
 MAX_GAME_STEPS = c.NUM_PLAYERS * c.NUM_CATEGORIES * (c.MAX_ROLLS_LEFT + 1)
@@ -28,12 +29,25 @@ class Trajectory(NamedTuple):
     returns: jax.Array
 
 
-def _winner_values(state: EnvState, acting_players: jax.Array) -> jax.Array:
-    totals = total_score(state.scorecards)
-    player0 = totals[:, 0]
-    player1 = totals[:, 1]
-    result_for_player0 = jnp.sign(player0 - player1).astype(jnp.float32)
-    return jnp.where(acting_players == 0, result_for_player0, -result_for_player0)
+def terminal_values(
+    state: EnvState,
+    acting_players: jax.Array,
+    reward_mode: str = WIN_LOSS_MARGIN,
+    margin_weight: float = 0.25,
+    margin_scale: float = 50.0,
+) -> jax.Array:
+    flat_players = acting_players.reshape((-1,))
+    repeated_scorecards = jnp.repeat(
+        state.scorecards[None, :, :, :], acting_players.shape[0], axis=0
+    ).reshape((-1,) + state.scorecards.shape[1:])
+    values = terminal_values_from_scores(
+        repeated_scorecards,
+        flat_players,
+        reward_mode=reward_mode,
+        margin_weight=margin_weight,
+        margin_scale=margin_scale,
+    )
+    return values.reshape(acting_players.shape)
 
 
 def generate_self_play(
@@ -42,6 +56,9 @@ def generate_self_play(
     rng_key: jax.Array,
     batch_size: int,
     num_simulations: int,
+    reward_mode: str = WIN_LOSS_MARGIN,
+    margin_weight: float = 0.25,
+    margin_scale: float = 50.0,
 ) -> tuple[Trajectory, dict[str, jax.Array]]:
     """Generate a fixed-length batch of two-player self-play games."""
     reset_key, scan_key = jax.random.split(rng_key)
@@ -52,7 +69,14 @@ def generate_self_play(
         key, search_key, env_key = jax.random.split(key, 3)
         obs = observation(current_state)
         policy = search_policy(
-            model, params, current_state, search_key, num_simulations=num_simulations
+            model,
+            params,
+            current_state,
+            search_key,
+            num_simulations=num_simulations,
+            reward_mode=reward_mode,
+            margin_weight=margin_weight,
+            margin_scale=margin_scale,
         )
         action = policy.action.astype(jnp.int32)
         next_state, _ = step(current_state, action, env_key)
@@ -75,7 +99,16 @@ def generate_self_play(
     )
     acting_players = frames[6]
     valid = frames[8]
-    returns = jnp.where(valid, _winner_values(final_state, acting_players), 0.0)
+    shaped_values = terminal_values(
+        final_state,
+        acting_players,
+        reward_mode=reward_mode,
+        margin_weight=margin_weight,
+        margin_scale=margin_scale,
+    )
+    returns = jnp.where(valid, shaped_values, 0.0)
+    totals = total_score(final_state.scorecards)
+    score_margin_player0 = totals[:, 0] - totals[:, 1]
 
     trajectory = Trajectory(
         own_filled=frames[0],
@@ -90,20 +123,24 @@ def generate_self_play(
         returns=returns,
     )
     metrics = {
-        "mean_player0_score": jnp.mean(total_score(final_state.scorecards)[:, 0]),
-        "mean_player1_score": jnp.mean(total_score(final_state.scorecards)[:, 1]),
+        "mean_player0_score": jnp.mean(totals[:, 0]),
+        "mean_player1_score": jnp.mean(totals[:, 1]),
         "player0_win_rate": jnp.mean(
-            total_score(final_state.scorecards)[:, 0]
-            > total_score(final_state.scorecards)[:, 1]
+            totals[:, 0]
+            > totals[:, 1]
         ),
         "player1_win_rate": jnp.mean(
-            total_score(final_state.scorecards)[:, 1]
-            > total_score(final_state.scorecards)[:, 0]
+            totals[:, 1]
+            > totals[:, 0]
         ),
         "draw_rate": jnp.mean(
-            total_score(final_state.scorecards)[:, 0]
-            == total_score(final_state.scorecards)[:, 1]
+            totals[:, 0]
+            == totals[:, 1]
         ),
+        "mean_score_margin_player0": jnp.mean(score_margin_player0),
+        "mean_abs_score_margin": jnp.mean(jnp.abs(score_margin_player0)),
+        "mean_shaped_return": jnp.sum(jnp.where(valid, returns, 0.0))
+        / jnp.maximum(jnp.sum(valid), 1),
     }
     return trajectory, metrics
 

@@ -13,9 +13,10 @@ from yahtzee_rl.actions import heuristic_action
 from yahtzee_rl.env import EnvState, legal_action_mask, observation, reset, step
 from yahtzee_rl.mcts import search_policy
 from yahtzee_rl.model import masked_logits
+from yahtzee_rl.rewards import WIN_LOSS_MARGIN
 from yahtzee_rl.scoring import total_score
 from yahtzee_rl.self_play import MAX_GAME_STEPS
-from yahtzee_rl.train import load_checkpoint
+from yahtzee_rl.train import load_checkpoint, load_checkpoint_config
 
 
 @dataclass(frozen=True)
@@ -26,6 +27,9 @@ class PolicySpec:
     params: object | None = None
     model: object | None = None
     step: int | None = None
+    reward_mode: str = WIN_LOSS_MARGIN
+    margin_weight: float = 0.25
+    margin_scale: float = 50.0
 
     @property
     def label(self) -> str:
@@ -38,6 +42,7 @@ def load_policy(kind: str, checkpoint: str | None, num_simulations: int) -> Poli
     if kind in {"greedy", "mcts"}:
         if checkpoint is None:
             raise ValueError(f"--checkpoint is required for {kind} policy")
+        config = load_checkpoint_config(checkpoint)
         state, model, step_idx = load_checkpoint(checkpoint)
         return PolicySpec(
             kind=kind,
@@ -46,6 +51,9 @@ def load_policy(kind: str, checkpoint: str | None, num_simulations: int) -> Poli
             params=state.params,
             model=model,
             step=step_idx,
+            reward_mode=config.reward_mode,
+            margin_weight=config.margin_weight,
+            margin_scale=config.margin_scale,
         )
     return PolicySpec(kind=kind, checkpoint=checkpoint, num_simulations=num_simulations)
 
@@ -72,6 +80,9 @@ def select_action(policy: PolicySpec, state: EnvState, key: jax.Array) -> jax.Ar
             state,
             key,
             num_simulations=policy.num_simulations,
+            reward_mode=policy.reward_mode,
+            margin_weight=policy.margin_weight,
+            margin_scale=policy.margin_scale,
         )
         return output.action.astype(jnp.int32)
 
