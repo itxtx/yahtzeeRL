@@ -37,6 +37,18 @@ def test_scoring_switches_player_and_fills_category():
     assert float(reward[0]) == 0.0
 
 
+def test_out_of_range_action_is_invalid_noop():
+    state = reset(jax.random.PRNGKey(0), batch_size=1)
+    state = state._replace(dice=jnp.array([[5, 5, 5, 2, 2]]), rolls_left=jnp.array([2]))
+
+    for action in (-1, c.NUM_ACTIONS, 999):
+        next_state, reward = step(state, jnp.array([action]), jax.random.PRNGKey(1))
+        assert float(reward[0]) == -1.0
+        assert bool(jnp.all(next_state.scorecards == state.scorecards))
+        assert int(next_state.rolls_left[0]) == int(state.rolls_left[0])
+        assert int(next_state.active_player[0]) == int(state.active_player[0])
+
+
 def test_terminal_winner_reward_is_from_actor_perspective():
     scorecards = jnp.zeros((1, c.NUM_PLAYERS, c.NUM_CATEGORIES), dtype=jnp.int32)
     scorecards = scorecards.at[0, 0, c.CHANCE].set(-1)

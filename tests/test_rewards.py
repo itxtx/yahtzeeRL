@@ -61,7 +61,9 @@ def test_margin_reward_increases_with_margin():
         margin_scale=50.0,
     )
 
-    assert float(large_value[0]) > float(small_value[0]) > 1.0
+    # Shaped reward stays within [-1, 1] (matching the tanh value head) while
+    # remaining monotonic in the score margin.
+    assert 1.0 >= float(large_value[0]) > float(small_value[0]) > 0.0
 
 
 def test_self_play_terminal_values_shape_and_perspective():

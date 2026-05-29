@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -18,7 +19,7 @@ from tqdm import trange
 
 import yahtzee_rl.constants as c
 from yahtzee_rl.env import observation, reset
-from yahtzee_rl.model import YahtzeeActorCritic
+from yahtzee_rl.model import YahtzeeActorCritic, legal_mask_from_obs, masked_logits
 from yahtzee_rl.rewards import REWARD_MODES, WIN_LOSS_MARGIN
 from yahtzee_rl.self_play import generate_self_play, trajectory_observation
 
@@ -60,6 +61,7 @@ def make_update_fn(model: YahtzeeActorCritic, config: TrainConfig):
     def loss_fn(params, trajectory):
         obs = trajectory_observation(trajectory)
         logits, values = model.apply({"params": params}, obs)
+        logits = masked_logits(logits, legal_mask_from_obs(obs))
 
         action_weights = trajectory.action_weights.reshape((-1, c.NUM_ACTIONS))
         returns = trajectory.returns.reshape((-1,))
@@ -84,8 +86,7 @@ def make_update_fn(model: YahtzeeActorCritic, config: TrainConfig):
         return total, metrics
 
     def update_step(state: AgentState, rng_key: jax.Array):
-        play_key, grad_key = jax.random.split(rng_key)
-        del grad_key
+        play_key = rng_key
         trajectory, play_metrics = generate_self_play(
             model,
             {"params": state.params},
@@ -109,15 +110,32 @@ def make_update_fn(model: YahtzeeActorCritic, config: TrainConfig):
 def save_checkpoint(path: Path, state: AgentState, config: TrainConfig, step: int) -> None:
     path = path.expanduser().resolve()
     path.mkdir(parents=True, exist_ok=True)
-    checkpointer = ocp.PyTreeCheckpointer()
+    checkpointer = ocp.StandardCheckpointer()
     payload = {"params": state.params, "opt_state": state.opt_state, "step": step}
-    checkpointer.save(path / f"step_{step:06d}", payload, force=True)
+    try:
+        checkpointer.save(path / f"step_{step:06d}", payload, force=True)
+        # Block until the async save fully finalizes so the checkpoint is
+        # complete before the process can exit (otherwise orbax background
+        # threads can fail during interpreter shutdown).
+        checkpointer.wait_until_finished()
+    finally:
+        checkpointer.close()
     (path / "config.json").write_text(json.dumps(asdict(config), indent=2), encoding="utf-8")
+
+
+_STEP_DIR_RE = re.compile(r"^step_\d+$")
 
 
 def latest_checkpoint(path: str | Path) -> Path:
     path = Path(path).expanduser().resolve()
-    candidates = sorted(path.glob("step_*"))
+    # Only consider finalized checkpoint dirs (step_<digits>), skipping orbax
+    # ".orbax-checkpoint-tmp" temp dirs left behind by interrupted saves.
+    # Sort by the numeric step (not lexicographically) so step_1000000 is
+    # correctly ordered after step_999999.
+    candidates = sorted(
+        (p for p in path.glob("step_*") if _STEP_DIR_RE.match(p.name)),
+        key=lambda p: int(p.name.split("_")[1]),
+    )
     if not candidates:
         raise FileNotFoundError(f"No checkpoints found in {path}")
     return candidates[-1]
@@ -125,7 +143,7 @@ def latest_checkpoint(path: str | Path) -> Path:
 
 def resolve_checkpoint_path(path: str | Path) -> Path:
     path = Path(path).expanduser().resolve()
-    return latest_checkpoint(path) if path.is_dir() and path.name.startswith("step_") is False else path
+    return latest_checkpoint(path) if path.is_dir() and not path.name.startswith("step_") else path
 
 
 def load_checkpoint_config(path: str | Path) -> TrainConfig:
@@ -145,8 +163,13 @@ def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tupl
         config = load_checkpoint_config(checkpoint_path)
 
     state, model, _ = create_train_state(config)
-    checkpointer = ocp.PyTreeCheckpointer()
-    restored = checkpointer.restore(checkpoint_path)
+    checkpointer = ocp.StandardCheckpointer()
+    # Provide an abstract target so arrays deserialize onto the local devices
+    # regardless of the sharding used when the checkpoint was written. Without a
+    # target, restoring a GPU/TPU-saved checkpoint on CPU fails with a
+    # "sharding ... Got None" error.
+    target = {"params": state.params, "opt_state": state.opt_state, "step": 0}
+    restored = checkpointer.restore(checkpoint_path, target=target)
     state = state.replace(params=restored["params"], opt_state=restored["opt_state"])
     return state, model, int(restored["step"])
 

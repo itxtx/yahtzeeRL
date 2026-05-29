@@ -20,6 +20,11 @@ def terminal_values_from_scores(
     margin_scale: float = 50.0,
 ) -> jax.Array:
     """Return terminal values from each requested player's perspective."""
+    if not 0.0 <= margin_weight <= 1.0:
+        raise ValueError(
+            f"margin_weight must be in [0, 1] to keep the shaped reward within "
+            f"[-1, 1]; got {margin_weight}"
+        )
     totals = total_score(scorecards)
     batch = jnp.arange(scorecards.shape[0])
     own_score = totals[batch, perspective_players]
@@ -30,7 +35,12 @@ def terminal_values_from_scores(
     if reward_mode == WIN_LOSS:
         return win_loss.astype(jnp.float32)
     if reward_mode == WIN_LOSS_MARGIN:
-        shaped = win_loss + margin_weight * jnp.tanh(margin / margin_scale)
+        # Keep the shaped target within [-1, 1] so it matches the tanh-bounded
+        # value head. margin_weight splits the unit reward between a win/loss
+        # baseline (1 - margin_weight) and a margin-sensitive term (margin_weight).
+        shaped = win_loss * (1.0 - margin_weight) + margin_weight * jnp.tanh(
+            margin / margin_scale
+        )
         return shaped.astype(jnp.float32)
     raise ValueError(f"Unknown reward mode: {reward_mode}")
 

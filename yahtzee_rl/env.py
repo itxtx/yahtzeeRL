@@ -105,11 +105,19 @@ def step(state: EnvState, action: jax.Array, key: jax.Array) -> tuple[EnvState, 
     """
     action = action.astype(jnp.int32)
     batch_size = state.scorecards.shape[0]
+    # Guard against out-of-range action ids before gathering: take_along_axis
+    # clamps OOB indices, which would otherwise let action=-1 or action>=45 read
+    # a valid mask entry and execute a clipped move. Gather with a safe index and
+    # require in-bounds so OOB actions resolve to invalid no-ops (reward -1).
+    in_bounds = (action >= 0) & (action < c.NUM_ACTIONS)
+    safe_action = jnp.clip(action, 0, c.NUM_ACTIONS - 1)
     legal = legal_action_mask(state)
-    chosen_legal = jnp.take_along_axis(legal, action[:, None], axis=-1)[:, 0]
+    chosen_legal = (
+        jnp.take_along_axis(legal, safe_action[:, None], axis=-1)[:, 0] & in_bounds
+    )
 
-    is_hold = action < c.NUM_HOLD_ACTIONS
-    is_score = ~is_hold
+    is_hold = (action < c.NUM_HOLD_ACTIONS) & in_bounds
+    is_score = (action >= c.NUM_HOLD_ACTIONS) & in_bounds
     roll_key, next_turn_key = jax.random.split(key)
 
     hold_mask = action_to_hold_mask(jnp.clip(action, 0, c.NUM_HOLD_ACTIONS - 1))

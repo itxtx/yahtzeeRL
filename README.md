@@ -24,8 +24,11 @@ python -m yahtzee_rl.train --steps 2 --batch-size 2 --num-simulations 2
 Training defaults to margin-shaped terminal rewards:
 
 ```text
-sign(score_margin) + 0.25 * tanh(score_margin / 50)
+sign(score_margin) * (1 - 0.25) + 0.25 * tanh(score_margin / 50)
 ```
+
+This stays within `[-1, 1]` to match the tanh-bounded value head, splitting the
+unit reward between a win/loss baseline and a margin-sensitive term.
 
 Use pure win/loss targets for comparison:
 

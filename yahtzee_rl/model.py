@@ -42,5 +42,21 @@ class YahtzeeActorCritic(nn.Module):
         return policy_logits, jnp.tanh(value[..., 0])
 
 
+def legal_mask_from_obs(obs: dict[str, jax.Array]) -> jax.Array:
+    """Reconstruct the legal-action mask from a flattened observation.
+
+    Hold actions are legal whenever rerolls remain; score actions are legal for
+    any category not yet filled on the active player's scorecard. This mirrors
+    env.legal_action_mask but operates on observation tensors (which is all the
+    training loop retains), ignoring the terminal no-op since done frames are
+    excluded from the loss via the validity mask.
+    """
+    batch = obs["own_filled"].shape[0]
+    hold_legal = (obs["rolls_left"] > 0)[:, None]
+    hold_mask = jnp.broadcast_to(hold_legal, (batch, c.NUM_HOLD_ACTIONS))
+    score_mask = obs["own_filled"] < 0.5
+    return jnp.concatenate([hold_mask, score_mask], axis=-1)
+
+
 def masked_logits(logits: jax.Array, legal_mask: jax.Array) -> jax.Array:
-    return jnp.where(legal_mask, logits, jnp.finfo(logits.dtype).min)
+    return jnp.where(legal_mask, logits, -1e9)

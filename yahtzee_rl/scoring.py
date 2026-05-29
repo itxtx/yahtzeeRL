@@ -46,7 +46,7 @@ def score_categories(dice: jax.Array) -> jax.Array:
         [
             jnp.where(has_three, total, 0),
             jnp.where(has_four, total, 0),
-            jnp.where((has_triple & has_pair) | has_five, 25, 0),
+            jnp.where(has_triple & has_pair, 25, 0),
             jnp.where(small_straight, 30, 0),
             jnp.where(large_straight, 40, 0),
             jnp.where(has_five, 50, 0),
