@@ -8,10 +8,18 @@ import yahtzee_rl.constants as c
 
 
 def flatten_observation(obs: dict[str, jax.Array]) -> jax.Array:
-    """Flatten the active-player observation into a dense feature vector."""
-    dice_one_hot = jax.nn.one_hot(obs["dice"] - 1, c.NUM_FACES).reshape(
-        obs["dice"].shape[0], c.NUM_DICE * c.NUM_FACES
+    """Flatten the active-player observation into a dense feature vector.
+
+    Dice are encoded as per-face count one-hots, which is permutation-invariant
+    and supports afterstates where some dice are pending a reroll (encoded via
+    num_unknown). opponent_to_move marks post-score afterstates where the
+    unknown dice belong to the opponent.
+    """
+    batch_size = obs["dice_counts"].shape[0]
+    counts_one_hot = jax.nn.one_hot(obs["dice_counts"], c.NUM_DICE + 1).reshape(
+        batch_size, c.NUM_FACES * (c.NUM_DICE + 1)
     )
+    unknown_one_hot = jax.nn.one_hot(obs["num_unknown"], c.NUM_DICE + 1)
     rolls_one_hot = jax.nn.one_hot(obs["rolls_left"], c.MAX_ROLLS_LEFT + 1)
     return jnp.concatenate(
         [
@@ -19,8 +27,12 @@ def flatten_observation(obs: dict[str, jax.Array]) -> jax.Array:
             obs["own_scores"],
             obs["opp_filled"],
             obs["opp_scores"],
-            dice_one_hot,
+            obs["upper_own"][:, None],
+            obs["upper_opp"][:, None],
+            counts_one_hot,
+            unknown_one_hot,
             rolls_one_hot,
+            obs["opponent_to_move"][:, None],
         ],
         axis=-1,
     )

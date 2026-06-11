@@ -83,6 +83,7 @@ def select_action(policy: PolicySpec, state: EnvState, key: jax.Array) -> jax.Ar
             reward_mode=policy.reward_mode,
             margin_weight=policy.margin_weight,
             margin_scale=policy.margin_scale,
+            eval_mode=True,
         )
         return output.action.astype(jnp.int32)
 
@@ -100,13 +101,19 @@ def run_games(
     key, reset_key = jax.random.split(key)
     state = reset(reset_key, num_games)
 
+    # Jit once per policy so the search is compiled instead of retraced on
+    # every one of the MAX_GAME_STEPS python-loop iterations.
+    action_a_fn = jax.jit(lambda s, k: select_action(policy_a, s, k))
+    action_b_fn = jax.jit(lambda s, k: select_action(policy_b, s, k))
+    step_fn = jax.jit(step)
+
     for _ in range(MAX_GAME_STEPS):
         key, key_a, key_b, step_key = jax.random.split(key, 4)
-        action_a = select_action(policy_a, state, key_a)
-        action_b = select_action(policy_b, state, key_b)
+        action_a = action_a_fn(state, key_a)
+        action_b = action_b_fn(state, key_b)
         use_a = state.active_player == seat_a
         action = jnp.where(use_a, action_a, action_b)
-        state, _ = step(state, action, step_key)
+        state, _ = step_fn(state, action, step_key)
 
     scores = total_score(state.scorecards)
     a_score = scores[:, seat_a]

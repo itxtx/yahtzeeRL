@@ -8,7 +8,7 @@ import jax
 import jax.numpy as jnp
 
 from yahtzee_rl import constants as c
-from yahtzee_rl.scoring import score_category, total_score
+from yahtzee_rl.scoring import dice_counts, score_category, total_score
 
 
 class EnvState(NamedTuple):
@@ -26,7 +26,14 @@ class EnvState(NamedTuple):
 
 
 def _roll_dice(key: jax.Array, batch_size: int) -> jax.Array:
+    """Roll unsorted iid dice. Callers must sort before storing in EnvState."""
     return jax.random.randint(key, (batch_size, c.NUM_DICE), 1, c.NUM_FACES + 1)
+
+
+def _sort_dice(dice: jax.Array) -> jax.Array:
+    """Canonicalize dice order. Dice are exchangeable, so sorting is
+    game-equivalent and collapses permutation-equivalent states."""
+    return jnp.sort(dice, axis=-1)
 
 
 def reset(key: jax.Array, batch_size: int = 1) -> EnvState:
@@ -36,7 +43,7 @@ def reset(key: jax.Array, batch_size: int = 1) -> EnvState:
     )
     return EnvState(
         scorecards=scorecards,
-        dice=_roll_dice(key, batch_size),
+        dice=_sort_dice(_roll_dice(key, batch_size)),
         rolls_left=jnp.full((batch_size,), c.MAX_ROLLS_LEFT, dtype=jnp.int32),
         active_player=jnp.zeros((batch_size,), dtype=jnp.int32),
         done=jnp.zeros((batch_size,), dtype=jnp.bool_),
@@ -48,21 +55,60 @@ def current_scorecard(state: EnvState) -> jax.Array:
     return state.scorecards[batch, state.active_player]
 
 
-def observation(state: EnvState) -> dict[str, jax.Array]:
-    """Encode observations from the active player's perspective."""
-    batch = jnp.arange(state.scorecards.shape[0])
-    opponent = 1 - state.active_player
-    own = state.scorecards[batch, state.active_player]
-    other = state.scorecards[batch, opponent]
+def _upper_progress(scorecard: jax.Array) -> jax.Array:
+    """Progress toward the upper-section bonus, in [0, 1]."""
+    upper_total = jnp.sum(jnp.maximum(scorecard[..., :6], 0), axis=-1)
+    return (
+        jnp.minimum(upper_total, c.UPPER_BONUS_THRESHOLD).astype(jnp.float32)
+        / c.UPPER_BONUS_THRESHOLD
+    )
+
+
+def encode_observation(
+    scorecards: jax.Array,
+    perspective_player: jax.Array,
+    dice_count_vec: jax.Array,
+    num_unknown: jax.Array,
+    rolls_left: jax.Array,
+    opponent_to_move: jax.Array,
+) -> dict[str, jax.Array]:
+    """Encode an observation (state or afterstate) from one player's view.
+
+    dice_count_vec holds per-face counts of the known dice; num_unknown is how
+    many dice are pending a reroll (always 0 for real states). opponent_to_move
+    distinguishes post-score afterstates, where the unknown dice belong to the
+    opponent, from hold afterstates and real states.
+    """
+    batch = jnp.arange(scorecards.shape[0])
+    own = scorecards[batch, perspective_player]
+    other = scorecards[batch, 1 - perspective_player]
     return {
         "own_filled": (own >= 0).astype(jnp.float32),
         "own_scores": jnp.maximum(own, 0).astype(jnp.float32) / 50.0,
         "opp_filled": (other >= 0).astype(jnp.float32),
         "opp_scores": jnp.maximum(other, 0).astype(jnp.float32) / 50.0,
-        "dice": state.dice,
-        "rolls_left": state.rolls_left,
-        "active_player": state.active_player,
+        "upper_own": _upper_progress(own),
+        "upper_opp": _upper_progress(other),
+        "dice_counts": dice_count_vec.astype(jnp.int32),
+        "num_unknown": num_unknown.astype(jnp.int32),
+        "rolls_left": rolls_left,
+        "opponent_to_move": opponent_to_move.astype(jnp.float32),
+        "active_player": perspective_player,
     }
+
+
+def observation(state: EnvState) -> dict[str, jax.Array]:
+    """Encode observations from the active player's perspective."""
+    batch_size = state.scorecards.shape[0]
+    zeros = jnp.zeros((batch_size,), dtype=jnp.int32)
+    return encode_observation(
+        scorecards=state.scorecards,
+        perspective_player=state.active_player,
+        dice_count_vec=dice_counts(state.dice),
+        num_unknown=zeros,
+        rolls_left=state.rolls_left,
+        opponent_to_move=zeros,
+    )
 
 
 def legal_action_mask(state: EnvState) -> jax.Array:
@@ -121,8 +167,10 @@ def step(state: EnvState, action: jax.Array, key: jax.Array) -> tuple[EnvState, 
     roll_key, next_turn_key = jax.random.split(key)
 
     hold_mask = action_to_hold_mask(jnp.clip(action, 0, c.NUM_HOLD_ACTIONS - 1))
+    # Combine kept dice with unsorted fresh rolls first, then sort, so the
+    # rerolled values stay iid uniform (positions of a pre-sorted roll are not).
     rerolled = _roll_dice(roll_key, batch_size)
-    dice_after_hold = jnp.where(hold_mask, state.dice, rerolled)
+    dice_after_hold = _sort_dice(jnp.where(hold_mask, state.dice, rerolled))
     rolls_left_after_hold = jnp.maximum(state.rolls_left - 1, 0)
 
     category = jnp.clip(action - c.NUM_HOLD_ACTIONS, 0, c.NUM_CATEGORIES - 1)
@@ -133,7 +181,7 @@ def step(state: EnvState, action: jax.Array, key: jax.Array) -> tuple[EnvState, 
     filled_after_score = scorecards_after_score >= 0
     done_after_score = jnp.all(filled_after_score, axis=(1, 2))
     next_player = 1 - state.active_player
-    next_turn_dice = _roll_dice(next_turn_key, batch_size)
+    next_turn_dice = _sort_dice(_roll_dice(next_turn_key, batch_size))
     terminal_reward = _terminal_reward(scorecards_after_score, state.active_player)
 
     terminal_noop = state.done & (action == 0)

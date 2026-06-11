@@ -21,10 +21,13 @@ class Trajectory(NamedTuple):
     own_scores: jax.Array
     opp_filled: jax.Array
     opp_scores: jax.Array
-    dice: jax.Array
+    upper_own: jax.Array
+    upper_opp: jax.Array
+    dice_counts: jax.Array
     rolls_left: jax.Array
     active_player: jax.Array
     action_weights: jax.Array
+    search_values: jax.Array
     valid: jax.Array
     returns: jax.Array
 
@@ -79,6 +82,9 @@ def generate_self_play(
             margin_scale=margin_scale,
         )
         action = policy.action.astype(jnp.int32)
+        # Root value of the (decision-masked) search tree: an improved value
+        # estimate used to reduce the variance of the Monte Carlo target.
+        search_value = policy.search_tree.summary().value
         next_state, _ = step(current_state, action, env_key)
         valid = ~current_state.done
         frame = (
@@ -86,10 +92,13 @@ def generate_self_play(
             obs["own_scores"],
             obs["opp_filled"],
             obs["opp_scores"],
-            obs["dice"],
+            obs["upper_own"],
+            obs["upper_opp"],
+            obs["dice_counts"],
             obs["rolls_left"],
             obs["active_player"],
             policy.action_weights,
+            search_value,
             valid,
         )
         return (next_state, key), frame
@@ -97,8 +106,8 @@ def generate_self_play(
     (final_state, _), frames = jax.lax.scan(
         scan_step, (state, scan_key), None, length=MAX_GAME_STEPS
     )
-    acting_players = frames[6]
-    valid = frames[8]
+    acting_players = frames[8]
+    valid = frames[11]
     shaped_values = terminal_values(
         final_state,
         acting_players,
@@ -115,28 +124,22 @@ def generate_self_play(
         own_scores=frames[1],
         opp_filled=frames[2],
         opp_scores=frames[3],
-        dice=frames[4],
-        rolls_left=frames[5],
-        active_player=frames[6],
-        action_weights=frames[7],
+        upper_own=frames[4],
+        upper_opp=frames[5],
+        dice_counts=frames[6],
+        rolls_left=frames[7],
+        active_player=frames[8],
+        action_weights=frames[9],
+        search_values=frames[10],
         valid=valid,
         returns=returns,
     )
     metrics = {
         "mean_player0_score": jnp.mean(totals[:, 0]),
         "mean_player1_score": jnp.mean(totals[:, 1]),
-        "player0_win_rate": jnp.mean(
-            totals[:, 0]
-            > totals[:, 1]
-        ),
-        "player1_win_rate": jnp.mean(
-            totals[:, 1]
-            > totals[:, 0]
-        ),
-        "draw_rate": jnp.mean(
-            totals[:, 0]
-            == totals[:, 1]
-        ),
+        "player0_win_rate": jnp.mean(totals[:, 0] > totals[:, 1]),
+        "player1_win_rate": jnp.mean(totals[:, 1] > totals[:, 0]),
+        "draw_rate": jnp.mean(totals[:, 0] == totals[:, 1]),
         "mean_score_margin_player0": jnp.mean(score_margin_player0),
         "mean_abs_score_margin": jnp.mean(jnp.abs(score_margin_player0)),
         "mean_shaped_return": jnp.sum(jnp.where(valid, returns, 0.0))
@@ -152,12 +155,18 @@ def trajectory_observation(trajectory: Trajectory) -> dict[str, jax.Array]:
     def flat(x):
         return x.reshape((time_steps * batch_size,) + x.shape[2:])
 
+    flat_rolls = trajectory.rolls_left.reshape((-1,))
+    zeros = jnp.zeros_like(flat_rolls)
     return {
         "own_filled": flat(trajectory.own_filled),
         "own_scores": flat(trajectory.own_scores),
         "opp_filled": flat(trajectory.opp_filled),
         "opp_scores": flat(trajectory.opp_scores),
-        "dice": flat(trajectory.dice),
-        "rolls_left": trajectory.rolls_left.reshape((-1,)),
+        "upper_own": trajectory.upper_own.reshape((-1,)),
+        "upper_opp": trajectory.upper_opp.reshape((-1,)),
+        "dice_counts": flat(trajectory.dice_counts),
+        "num_unknown": zeros,
+        "rolls_left": flat_rolls,
+        "opponent_to_move": zeros.astype(jnp.float32),
         "active_player": trajectory.active_player.reshape((-1,)),
     }

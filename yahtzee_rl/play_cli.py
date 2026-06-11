@@ -113,6 +113,7 @@ def agent_action(
             reward_mode=reward_mode,
             margin_weight=margin_weight,
             margin_scale=margin_scale,
+            eval_mode=True,
         )
         return _scalar(policy.action[0])
 
@@ -147,6 +148,7 @@ def agent_debug_lines(
             reward_mode=reward_mode,
             margin_weight=margin_weight,
             margin_scale=margin_scale,
+            eval_mode=True,
         )
         weights = policy.action_weights
         action = _scalar(policy.action[0])

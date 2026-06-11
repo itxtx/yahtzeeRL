@@ -11,6 +11,7 @@ from pathlib import Path
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 import optax
 import orbax.checkpoint as ocp
 import rlax
@@ -21,7 +22,7 @@ import yahtzee_rl.constants as c
 from yahtzee_rl.env import observation, reset
 from yahtzee_rl.model import YahtzeeActorCritic, legal_mask_from_obs, masked_logits
 from yahtzee_rl.rewards import REWARD_MODES, WIN_LOSS_MARGIN
-from yahtzee_rl.self_play import generate_self_play, trajectory_observation
+from yahtzee_rl.self_play import Trajectory, generate_self_play, trajectory_observation
 
 
 @dataclass(frozen=True)
@@ -33,13 +34,65 @@ class TrainConfig:
     num_simulations: int = 32
     learning_rate: float = 3e-4
     value_coef: float = 1.0
-    entropy_coef: float = 1e-3
+    entropy_coef: float = 0.0
     checkpoint_dir: str = "checkpoints"
     checkpoint_every: int = 100
     log_every: int = 10
     reward_mode: str = WIN_LOSS_MARGIN
     margin_weight: float = 0.25
     margin_scale: float = 50.0
+    # Replay settings: each update generates one batch of games, then takes
+    # several SGD steps on minibatches sampled from a buffer of recent frames,
+    # amortizing the (expensive) search-based generation cost.
+    buffer_size: int = 100_000
+    minibatches_per_update: int = 4
+    minibatch_size: int = 1024
+    # Value target: outcome_weight * terminal_outcome
+    #             + (1 - outcome_weight) * search_root_value.
+    value_target_outcome_weight: float = 0.5
+
+
+FRAME_KEYS = (
+    "own_filled",
+    "own_scores",
+    "opp_filled",
+    "opp_scores",
+    "upper_own",
+    "upper_opp",
+    "dice_counts",
+    "num_unknown",
+    "rolls_left",
+    "opponent_to_move",
+    "action_weights",
+    "value_target",
+)
+
+
+class ReplayBuffer:
+    """Fixed-capacity host-side ring buffer of training frames."""
+
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.storage: dict[str, np.ndarray] | None = None
+        self.size = 0
+        self.position = 0
+
+    def add(self, frames: dict[str, np.ndarray]) -> None:
+        count = frames[FRAME_KEYS[0]].shape[0]
+        if self.storage is None:
+            self.storage = {
+                key: np.zeros((self.capacity,) + value.shape[1:], dtype=value.dtype)
+                for key, value in frames.items()
+            }
+        indices = (self.position + np.arange(count)) % self.capacity
+        for key, value in frames.items():
+            self.storage[key][indices] = value
+        self.position = int((self.position + count) % self.capacity)
+        self.size = int(min(self.size + count, self.capacity))
+
+    def sample(self, batch_size: int, rng: np.random.Generator) -> dict[str, np.ndarray]:
+        indices = rng.integers(0, self.size, size=batch_size)
+        return {key: value[indices] for key, value in self.storage.items()}
 
 
 class AgentState(train_state.TrainState):
@@ -57,25 +110,60 @@ def create_train_state(config: TrainConfig) -> tuple[AgentState, YahtzeeActorCri
     return state, model, key
 
 
-def make_update_fn(model: YahtzeeActorCritic, config: TrainConfig):
-    def loss_fn(params, trajectory):
-        obs = trajectory_observation(trajectory)
+def frames_from_trajectory(trajectory: Trajectory, config: TrainConfig) -> dict[str, np.ndarray]:
+    """Flatten a trajectory into valid frames with blended value targets."""
+    obs = trajectory_observation(trajectory)
+    valid = np.asarray(jax.device_get(trajectory.valid.reshape((-1,))))
+    outcome_weight = config.value_target_outcome_weight
+    value_target = (
+        outcome_weight * trajectory.returns.reshape((-1,))
+        + (1.0 - outcome_weight) * trajectory.search_values.reshape((-1,))
+    )
+    frames = {key: np.asarray(jax.device_get(obs[key])) for key in obs if key != "active_player"}
+    frames["action_weights"] = np.asarray(
+        jax.device_get(trajectory.action_weights.reshape((-1, c.NUM_ACTIONS)))
+    )
+    frames["value_target"] = np.asarray(jax.device_get(value_target))
+    return {key: value[valid] for key, value in frames.items()}
+
+
+def make_generate_fn(model: YahtzeeActorCritic, config: TrainConfig):
+    def generate(params, rng_key):
+        return generate_self_play(
+            model,
+            {"params": params},
+            rng_key,
+            batch_size=config.batch_size,
+            num_simulations=config.num_simulations,
+            reward_mode=config.reward_mode,
+            margin_weight=config.margin_weight,
+            margin_scale=config.margin_scale,
+        )
+
+    return jax.jit(generate)
+
+
+def make_train_step(model: YahtzeeActorCritic, config: TrainConfig):
+    def loss_fn(params, batch):
+        obs = {
+            "own_filled": batch["own_filled"],
+            "own_scores": batch["own_scores"],
+            "opp_filled": batch["opp_filled"],
+            "opp_scores": batch["opp_scores"],
+            "upper_own": batch["upper_own"],
+            "upper_opp": batch["upper_opp"],
+            "dice_counts": batch["dice_counts"],
+            "num_unknown": batch["num_unknown"],
+            "rolls_left": batch["rolls_left"],
+            "opponent_to_move": batch["opponent_to_move"],
+        }
         logits, values = model.apply({"params": params}, obs)
         logits = masked_logits(logits, legal_mask_from_obs(obs))
 
-        action_weights = trajectory.action_weights.reshape((-1, c.NUM_ACTIONS))
-        returns = trajectory.returns.reshape((-1,))
-        valid = trajectory.valid.reshape((-1,)).astype(jnp.float32)
-        denom = jnp.maximum(jnp.sum(valid), 1.0)
-
         log_probs = jax.nn.log_softmax(logits)
-        policy_loss = -jnp.sum(action_weights * log_probs, axis=-1)
-        value_loss = rlax.l2_loss(values - returns)
-        entropy = -jnp.sum(jax.nn.softmax(logits) * log_probs, axis=-1)
-
-        policy_loss = jnp.sum(policy_loss * valid) / denom
-        value_loss = jnp.sum(value_loss * valid) / denom
-        entropy = jnp.sum(entropy * valid) / denom
+        policy_loss = jnp.mean(-jnp.sum(batch["action_weights"] * log_probs, axis=-1))
+        value_loss = jnp.mean(rlax.l2_loss(values - batch["value_target"]))
+        entropy = jnp.mean(-jnp.sum(jax.nn.softmax(logits) * log_probs, axis=-1))
         total = policy_loss + config.value_coef * value_loss - config.entropy_coef * entropy
         metrics = {
             "loss": total,
@@ -85,26 +173,13 @@ def make_update_fn(model: YahtzeeActorCritic, config: TrainConfig):
         }
         return total, metrics
 
-    def update_step(state: AgentState, rng_key: jax.Array):
-        play_key = rng_key
-        trajectory, play_metrics = generate_self_play(
-            model,
-            {"params": state.params},
-            play_key,
-            batch_size=config.batch_size,
-            num_simulations=config.num_simulations,
-            reward_mode=config.reward_mode,
-            margin_weight=config.margin_weight,
-            margin_scale=config.margin_scale,
-        )
+    def train_step(state: AgentState, batch):
         (loss, metrics), grads = jax.value_and_grad(loss_fn, has_aux=True)(
-            state.params, trajectory
+            state.params, batch
         )
-        new_state = state.apply_gradients(grads=grads)
-        metrics = metrics | play_metrics | {"loss": loss}
-        return new_state, metrics
+        return state.apply_gradients(grads=grads), metrics
 
-    return jax.jit(update_step)
+    return jax.jit(train_step)
 
 
 def save_checkpoint(path: Path, state: AgentState, config: TrainConfig, step: int) -> None:
@@ -149,12 +224,17 @@ def resolve_checkpoint_path(path: str | Path) -> Path:
 def load_checkpoint_config(path: str | Path) -> TrainConfig:
     checkpoint_path = resolve_checkpoint_path(path)
     config_path = checkpoint_path.parent / "config.json"
-    if config_path.exists():
-        raw_config = json.loads(config_path.read_text(encoding="utf-8"))
-        defaults = asdict(TrainConfig())
-        defaults.update(raw_config)
-        return TrainConfig(**defaults)
-    return TrainConfig(batch_size=1)
+    if not config_path.exists():
+        # Silently assuming default hyperparameters (e.g. hidden_dim) would
+        # fail later with opaque parameter-shape errors; fail loudly instead.
+        raise FileNotFoundError(
+            f"No config.json next to checkpoint {checkpoint_path}; cannot "
+            "reconstruct the model architecture used at training time."
+        )
+    raw_config = json.loads(config_path.read_text(encoding="utf-8"))
+    defaults = asdict(TrainConfig())
+    defaults.update(raw_config)
+    return TrainConfig(**defaults)
 
 
 def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tuple[AgentState, YahtzeeActorCritic, int]:
@@ -176,18 +256,32 @@ def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tupl
 
 def train(config: TrainConfig) -> AgentState:
     state, model, key = create_train_state(config)
-    update_step = make_update_fn(model, config)
+    generate = make_generate_fn(model, config)
+    train_step = make_train_step(model, config)
+    buffer = ReplayBuffer(config.buffer_size)
+    sample_rng = np.random.default_rng(config.seed)
     checkpoint_dir = Path(config.checkpoint_dir)
 
     print(f"JAX devices: {jax.devices()}")
-    print(f"Training {config.steps} updates with batch={config.batch_size}, sims={config.num_simulations}")
+    print(
+        f"Training {config.steps} updates with batch={config.batch_size}, "
+        f"sims={config.num_simulations}, "
+        f"minibatches={config.minibatches_per_update}x{config.minibatch_size}"
+    )
 
     last_log = time.time()
     for step_idx in trange(1, config.steps + 1):
-        key, step_key = jax.random.split(key)
-        state, metrics = update_step(state, step_key)
+        key, play_key = jax.random.split(key)
+        trajectory, play_metrics = generate(state.params, play_key)
+        buffer.add(frames_from_trajectory(trajectory, config))
+
+        metrics = {}
+        for _ in range(config.minibatches_per_update):
+            batch = buffer.sample(config.minibatch_size, sample_rng)
+            state, metrics = train_step(state, batch)
 
         if step_idx % config.log_every == 0 or step_idx == 1:
+            metrics = metrics | play_metrics | {"buffer_size": buffer.size}
             ready_metrics = jax.tree_util.tree_map(lambda x: float(jax.device_get(x)), metrics)
             now = time.time()
             steps_per_sec = config.log_every / max(now - last_log, 1e-6)
@@ -199,7 +293,7 @@ def train(config: TrainConfig) -> AgentState:
                 "p0w={player0_win_rate:.2f} p1w={player1_win_rate:.2f} "
                 "draw={draw_rate:.2f} margin={mean_score_margin_player0:.1f} "
                 "abs_margin={mean_abs_score_margin:.1f} shaped={mean_shaped_return:.3f} "
-                "ups={ups:.2f}".format(
+                "buffer={buffer_size:.0f} ups={ups:.2f}".format(
                     step=step_idx, ups=steps_per_sec, **ready_metrics
                 )
             )
@@ -224,6 +318,16 @@ def parse_args() -> TrainConfig:
     parser.add_argument("--reward-mode", choices=REWARD_MODES, default=TrainConfig.reward_mode)
     parser.add_argument("--margin-weight", type=float, default=TrainConfig.margin_weight)
     parser.add_argument("--margin-scale", type=float, default=TrainConfig.margin_scale)
+    parser.add_argument("--buffer-size", type=int, default=TrainConfig.buffer_size)
+    parser.add_argument(
+        "--minibatches-per-update", type=int, default=TrainConfig.minibatches_per_update
+    )
+    parser.add_argument("--minibatch-size", type=int, default=TrainConfig.minibatch_size)
+    parser.add_argument(
+        "--value-target-outcome-weight",
+        type=float,
+        default=TrainConfig.value_target_outcome_weight,
+    )
     args = parser.parse_args()
     return TrainConfig(**vars(args))
 

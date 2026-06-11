@@ -6,6 +6,16 @@ The current implementation targets two-player head-to-head self-play using
 simplified standard Yahtzee scoring: 13 categories plus upper bonus, without
 Joker rules or extra Yahtzee bonuses.
 
+The search uses Stochastic MuZero (`mctx.stochastic_muzero_policy`) with
+explicit decision and chance nodes: actions resolve to afterstates, and the
+pending dice reroll is a chance node over the 252 sorted 5-dice hands with its
+exact multinomial distribution computed analytically. Dice are kept sorted in
+the environment (game-equivalent), so permutation-equivalent states collapse.
+Training samples minibatches from a replay buffer of recent self-play frames
+and regresses values onto a blend of the terminal outcome and the search root
+value (`--value-target-outcome-weight`). Evaluation and CLI play run the search
+without Dirichlet noise and act greedily on visit counts.
+
 ## Local CPU Smoke Tests
 
 ```bash
@@ -34,6 +44,16 @@ Use pure win/loss targets for comparison:
 
 ```bash
 python -m yahtzee_rl.train --reward-mode win_loss
+```
+
+Replay and value-target knobs (defaults shown):
+
+```bash
+python -m yahtzee_rl.train \
+  --buffer-size 100000 \
+  --minibatches-per-update 4 \
+  --minibatch-size 1024 \
+  --value-target-outcome-weight 0.5
 ```
 
 For GPU training, copy this repo to Google Drive and run:
