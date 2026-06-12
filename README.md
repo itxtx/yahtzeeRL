@@ -46,6 +46,18 @@ Use pure win/loss targets for comparison:
 python -m yahtzee_rl.train --reward-mode win_loss
 ```
 
+Resume from a checkpoint (restores params + optimizer state, continues global
+step numbering, runs `--steps` additional updates; hyperparameters like
+`--num-simulations` may change between runs, `--hidden-dim` must match):
+
+```bash
+python -m yahtzee_rl.train \
+  --resume checkpoints/colab_run \
+  --checkpoint-dir checkpoints/colab_run \
+  --steps 4000 \
+  --num-simulations 64
+```
+
 Replay and value-target knobs (defaults shown):
 
 ```bash

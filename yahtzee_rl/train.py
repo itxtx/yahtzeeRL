@@ -254,12 +254,28 @@ def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tupl
     return state, model, int(restored["step"])
 
 
-def train(config: TrainConfig) -> AgentState:
+def train(config: TrainConfig, resume_from: str | None = None) -> AgentState:
     state, model, key = create_train_state(config)
+    start_step = 0
+    if resume_from is not None:
+        checkpoint_config = load_checkpoint_config(resume_from)
+        if checkpoint_config.hidden_dim != config.hidden_dim:
+            raise ValueError(
+                f"Checkpoint was trained with hidden_dim="
+                f"{checkpoint_config.hidden_dim} but this run requests "
+                f"hidden_dim={config.hidden_dim}; the architectures must match "
+                "to resume."
+            )
+        state, model, start_step = load_checkpoint(resume_from, config)
+        # Fold the restored step into the rng stream so a resumed run does not
+        # replay the same self-play games as a fresh run with the same seed.
+        key = jax.random.fold_in(key, start_step)
+        print(f"Resumed params and optimizer state from step {start_step}")
+
     generate = make_generate_fn(model, config)
     train_step = make_train_step(model, config)
     buffer = ReplayBuffer(config.buffer_size)
-    sample_rng = np.random.default_rng(config.seed)
+    sample_rng = np.random.default_rng(config.seed + start_step)
     checkpoint_dir = Path(config.checkpoint_dir)
 
     print(f"JAX devices: {jax.devices()}")
@@ -267,10 +283,11 @@ def train(config: TrainConfig) -> AgentState:
         f"Training {config.steps} updates with batch={config.batch_size}, "
         f"sims={config.num_simulations}, "
         f"minibatches={config.minibatches_per_update}x{config.minibatch_size}"
+        + (f", resuming at global step {start_step}" if start_step else "")
     )
 
     last_log = time.time()
-    for step_idx in trange(1, config.steps + 1):
+    for step_idx in trange(start_step + 1, start_step + config.steps + 1):
         key, play_key = jax.random.split(key)
         trajectory, play_metrics = generate(state.params, play_key)
         buffer.add(frames_from_trajectory(trajectory, config))
@@ -280,7 +297,7 @@ def train(config: TrainConfig) -> AgentState:
             batch = buffer.sample(config.minibatch_size, sample_rng)
             state, metrics = train_step(state, batch)
 
-        if step_idx % config.log_every == 0 or step_idx == 1:
+        if step_idx % config.log_every == 0 or step_idx == start_step + 1:
             metrics = metrics | play_metrics | {"buffer_size": buffer.size}
             ready_metrics = jax.tree_util.tree_map(lambda x: float(jax.device_get(x)), metrics)
             now = time.time()
@@ -298,14 +315,25 @@ def train(config: TrainConfig) -> AgentState:
                 )
             )
 
-        if step_idx % config.checkpoint_every == 0 or step_idx == config.steps:
+        if step_idx % config.checkpoint_every == 0 or step_idx == start_step + config.steps:
             save_checkpoint(checkpoint_dir, state, config, step_idx)
 
     return state
 
 
-def parse_args() -> TrainConfig:
+def parse_args() -> tuple[TrainConfig, str | None]:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--resume",
+        type=str,
+        default=None,
+        help=(
+            "Checkpoint dir (or step path) to resume from. Restores params and "
+            "optimizer state, continues global step numbering, and runs --steps "
+            "additional updates. Other flags (e.g. --num-simulations) may differ "
+            "from the original run; --hidden-dim must match."
+        ),
+    )
     parser.add_argument("--steps", type=int, default=TrainConfig.steps)
     parser.add_argument("--batch-size", type=int, default=TrainConfig.batch_size)
     parser.add_argument("--hidden-dim", type=int, default=TrainConfig.hidden_dim)
@@ -329,11 +357,14 @@ def parse_args() -> TrainConfig:
         default=TrainConfig.value_target_outcome_weight,
     )
     args = parser.parse_args()
-    return TrainConfig(**vars(args))
+    arg_dict = vars(args)
+    resume_from = arg_dict.pop("resume")
+    return TrainConfig(**arg_dict), resume_from
 
 
 def main() -> None:
-    train(parse_args())
+    config, resume_from = parse_args()
+    train(config, resume_from=resume_from)
 
 
 if __name__ == "__main__":
