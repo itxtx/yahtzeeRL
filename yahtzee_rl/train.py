@@ -6,7 +6,7 @@ import argparse
 import json
 import re
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 import jax
@@ -50,6 +50,14 @@ class TrainConfig:
     # Value target: outcome_weight * terminal_outcome
     #             + (1 - outcome_weight) * search_root_value.
     value_target_outcome_weight: float = 0.5
+    # Optional periodic high-quality search teacher. When enabled, every
+    # teacher_every-th global update generates self-play with the teacher
+    # batch/simulation settings, then can take a different number of SGD steps.
+    teacher_every: int = 0
+    teacher_num_simulations: int | None = None
+    teacher_batch_size: int | None = None
+    teacher_minibatches_per_update: int | None = None
+    teacher_minibatch_size: int | None = None
 
 
 FRAME_KEYS = (
@@ -97,6 +105,83 @@ class ReplayBuffer:
 
 class AgentState(train_state.TrainState):
     pass
+
+
+def _positive(name: str, value: int) -> None:
+    if value <= 0:
+        raise ValueError(f"{name} must be positive, got {value}")
+
+
+def teacher_enabled(config: TrainConfig) -> bool:
+    return config.teacher_every > 0
+
+
+def validate_config(config: TrainConfig) -> None:
+    _positive("batch_size", config.batch_size)
+    _positive("num_simulations", config.num_simulations)
+    _positive("minibatches_per_update", config.minibatches_per_update)
+    _positive("minibatch_size", config.minibatch_size)
+    if config.teacher_every < 0:
+        raise ValueError(f"teacher_every must be non-negative, got {config.teacher_every}")
+
+    teacher_overrides = (
+        config.teacher_num_simulations,
+        config.teacher_batch_size,
+        config.teacher_minibatches_per_update,
+        config.teacher_minibatch_size,
+    )
+    has_teacher_override = any(value is not None for value in teacher_overrides)
+    if config.teacher_every == 0:
+        if has_teacher_override:
+            raise ValueError("Teacher schedule options require --teacher-every > 0.")
+        return
+    if not has_teacher_override:
+        raise ValueError("--teacher-every requires at least one teacher override.")
+
+    if config.teacher_num_simulations is not None:
+        _positive("teacher_num_simulations", config.teacher_num_simulations)
+    if config.teacher_batch_size is not None:
+        _positive("teacher_batch_size", config.teacher_batch_size)
+    if config.teacher_minibatches_per_update is not None:
+        _positive(
+            "teacher_minibatches_per_update",
+            config.teacher_minibatches_per_update,
+        )
+    if config.teacher_minibatch_size is not None:
+        _positive("teacher_minibatch_size", config.teacher_minibatch_size)
+
+
+def teacher_play_config(config: TrainConfig) -> TrainConfig:
+    return replace(
+        config,
+        batch_size=(
+            config.teacher_batch_size
+            if config.teacher_batch_size is not None
+            else config.batch_size
+        ),
+        num_simulations=(
+            config.teacher_num_simulations
+            if config.teacher_num_simulations is not None
+            else config.num_simulations
+        ),
+    )
+
+
+def update_minibatch_settings(config: TrainConfig, use_teacher: bool) -> tuple[int, int]:
+    if not use_teacher:
+        return config.minibatches_per_update, config.minibatch_size
+    return (
+        config.teacher_minibatches_per_update
+        if config.teacher_minibatches_per_update is not None
+        else config.minibatches_per_update,
+        config.teacher_minibatch_size
+        if config.teacher_minibatch_size is not None
+        else config.minibatch_size,
+    )
+
+
+def is_teacher_step(config: TrainConfig, step: int) -> bool:
+    return teacher_enabled(config) and step % config.teacher_every == 0
 
 
 def create_train_state(config: TrainConfig) -> tuple[AgentState, YahtzeeActorCritic, jax.Array]:
@@ -255,6 +340,7 @@ def load_checkpoint(path: str | Path, config: TrainConfig | None = None) -> tupl
 
 
 def train(config: TrainConfig, resume_from: str | None = None) -> AgentState:
+    validate_config(config)
     state, model, key = create_train_state(config)
     start_step = 0
     if resume_from is not None:
@@ -273,6 +359,10 @@ def train(config: TrainConfig, resume_from: str | None = None) -> AgentState:
         print(f"Resumed params and optimizer state from step {start_step}")
 
     generate = make_generate_fn(model, config)
+    teacher_config = teacher_play_config(config) if teacher_enabled(config) else None
+    teacher_generate = (
+        make_generate_fn(model, teacher_config) if teacher_config is not None else None
+    )
     train_step = make_train_step(model, config)
     buffer = ReplayBuffer(config.buffer_size)
     sample_rng = np.random.default_rng(config.seed + start_step)
@@ -285,16 +375,36 @@ def train(config: TrainConfig, resume_from: str | None = None) -> AgentState:
         f"minibatches={config.minibatches_per_update}x{config.minibatch_size}"
         + (f", resuming at global step {start_step}" if start_step else "")
     )
+    if teacher_config is not None:
+        teacher_minibatches, teacher_minibatch_size = update_minibatch_settings(
+            config, use_teacher=True
+        )
+        print(
+            f"Teacher update every {config.teacher_every} global steps with "
+            f"batch={teacher_config.batch_size}, "
+            f"sims={teacher_config.num_simulations}, "
+            f"minibatches={teacher_minibatches}x{teacher_minibatch_size}"
+        )
 
     last_log = time.time()
     for step_idx in trange(start_step + 1, start_step + config.steps + 1):
         key, play_key = jax.random.split(key)
-        trajectory, play_metrics = generate(state.params, play_key)
+        use_teacher = is_teacher_step(config, step_idx)
+        play_config = (
+            teacher_config if use_teacher and teacher_config is not None else config
+        )
+        generate_fn = (
+            teacher_generate
+            if use_teacher and teacher_generate is not None
+            else generate
+        )
+        trajectory, play_metrics = generate_fn(state.params, play_key)
         buffer.add(frames_from_trajectory(trajectory, config))
 
         metrics = {}
-        for _ in range(config.minibatches_per_update):
-            batch = buffer.sample(config.minibatch_size, sample_rng)
+        minibatches, minibatch_size = update_minibatch_settings(config, use_teacher)
+        for _ in range(minibatches):
+            batch = buffer.sample(minibatch_size, sample_rng)
             state, metrics = train_step(state, batch)
 
         if step_idx % config.log_every == 0 or step_idx == start_step + 1:
@@ -304,14 +414,23 @@ def train(config: TrainConfig, resume_from: str | None = None) -> AgentState:
             steps_per_sec = config.log_every / max(now - last_log, 1e-6)
             last_log = now
             print(
-                "step={step} loss={loss:.4f} policy={policy_loss:.4f} "
+                "step={step} mode={mode} gen={play_batch}x{play_sims} "
+                "sgd={sgd_minibatches}x{sgd_minibatch_size} "
+                "loss={loss:.4f} policy={policy_loss:.4f} "
                 "value={value_loss:.4f} entropy={entropy:.3f} "
                 "p0={mean_player0_score:.1f} p1={mean_player1_score:.1f} "
                 "p0w={player0_win_rate:.2f} p1w={player1_win_rate:.2f} "
                 "draw={draw_rate:.2f} margin={mean_score_margin_player0:.1f} "
                 "abs_margin={mean_abs_score_margin:.1f} shaped={mean_shaped_return:.3f} "
                 "buffer={buffer_size:.0f} ups={ups:.2f}".format(
-                    step=step_idx, ups=steps_per_sec, **ready_metrics
+                    step=step_idx,
+                    mode="teacher" if use_teacher else "base",
+                    play_batch=play_config.batch_size,
+                    play_sims=play_config.num_simulations,
+                    sgd_minibatches=minibatches,
+                    sgd_minibatch_size=minibatch_size,
+                    ups=steps_per_sec,
+                    **ready_metrics,
                 )
             )
 
@@ -355,6 +474,36 @@ def parse_args() -> tuple[TrainConfig, str | None]:
         "--value-target-outcome-weight",
         type=float,
         default=TrainConfig.value_target_outcome_weight,
+    )
+    parser.add_argument(
+        "--teacher-every",
+        type=int,
+        default=TrainConfig.teacher_every,
+        help=(
+            "Enable periodic teacher updates every N global steps. Teacher "
+            "updates can use higher simulations, a smaller batch, and different "
+            "SGD minibatch settings."
+        ),
+    )
+    parser.add_argument(
+        "--teacher-num-simulations",
+        type=int,
+        default=TrainConfig.teacher_num_simulations,
+    )
+    parser.add_argument(
+        "--teacher-batch-size",
+        type=int,
+        default=TrainConfig.teacher_batch_size,
+    )
+    parser.add_argument(
+        "--teacher-minibatches-per-update",
+        type=int,
+        default=TrainConfig.teacher_minibatches_per_update,
+    )
+    parser.add_argument(
+        "--teacher-minibatch-size",
+        type=int,
+        default=TrainConfig.teacher_minibatch_size,
     )
     args = parser.parse_args()
     arg_dict = vars(args)

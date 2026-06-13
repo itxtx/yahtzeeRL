@@ -9,8 +9,12 @@ from yahtzee_rl.train import (
     ReplayBuffer,
     TrainConfig,
     frames_from_trajectory,
+    is_teacher_step,
     load_checkpoint_config,
     make_train_step,
+    teacher_play_config,
+    update_minibatch_settings,
+    validate_config,
 )
 
 
@@ -66,3 +70,34 @@ def test_missing_checkpoint_config_raises(tmp_path):
     step_dir.mkdir()
     with pytest.raises(FileNotFoundError):
         load_checkpoint_config(step_dir)
+
+
+def test_teacher_schedule_helpers():
+    config = TrainConfig(
+        batch_size=64,
+        num_simulations=128,
+        minibatches_per_update=2,
+        minibatch_size=512,
+        teacher_every=5,
+        teacher_num_simulations=256,
+        teacher_batch_size=32,
+        teacher_minibatches_per_update=4,
+    )
+
+    validate_config(config)
+    teacher_config = teacher_play_config(config)
+
+    assert teacher_config.batch_size == 32
+    assert teacher_config.num_simulations == 256
+    assert update_minibatch_settings(config, use_teacher=False) == (2, 512)
+    assert update_minibatch_settings(config, use_teacher=True) == (4, 512)
+    assert is_teacher_step(config, 10)
+    assert not is_teacher_step(config, 11)
+
+
+def test_teacher_options_require_enabled_schedule():
+    with pytest.raises(ValueError):
+        validate_config(TrainConfig(teacher_num_simulations=256))
+
+    with pytest.raises(ValueError):
+        validate_config(TrainConfig(teacher_every=5))

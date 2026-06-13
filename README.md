@@ -68,6 +68,23 @@ python -m yahtzee_rl.train \
   --value-target-outcome-weight 0.5
 ```
 
+Late-training teacher updates can periodically spend more search on a smaller
+self-play batch while keeping most updates cheaper:
+
+```bash
+python -m yahtzee_rl.train \
+  --resume checkpoints/colab_run \
+  --checkpoint-dir checkpoints/colab_run \
+  --steps 1000 \
+  --batch-size 48 \
+  --num-simulations 172 \
+  --minibatches-per-update 2 \
+  --teacher-every 5 \
+  --teacher-batch-size 32 \
+  --teacher-num-simulations 256 \
+  --teacher-minibatches-per-update 4
+```
+
 For GPU training, copy this repo to Google Drive and run:
 
 ```text
