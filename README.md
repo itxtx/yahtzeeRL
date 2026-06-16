@@ -35,6 +35,9 @@ Continuing the same win/loss-margin training after this point produced
 regressions and very small, noisy gains, so further work should not be framed as
 Kaggle-style hyperparameter chasing on the same objective.
 
+See [EVAL_RESULTS.md](EVAL_RESULTS.md) for the collected checkpoint comparison
+logs.
+
 The next distinct research direction is a score-maximizing Yahtzee agent. That
 should be treated as a new objective, not a continuation of the competitive
 head-to-head run. A plausible target is to optimize final own score directly,
@@ -50,12 +53,16 @@ range if the score-max objective learns a higher-variance style.
 
 ## Pretrained Checkpoint
 
-The best competitive checkpoint is available on Hugging Face:
+The best competitive checkpoint is available on
+[Hugging Face](https://huggingface.co/itxtx/yahtzee-rl-checkpoints):
 
 ```bash
 hf download itxtx/yahtzee-rl-checkpoints \
   --local-dir checkpoints/win_loss_margin_32simsrun4
 ```
+
+See [HUGGINGFACE_MODEL_CARD.md](HUGGINGFACE_MODEL_CARD.md) for the draft model
+card used to describe the checkpoint repository.
 
 Evaluate it against the heuristic baseline:
 
