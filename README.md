@@ -61,8 +61,12 @@ hf download itxtx/yahtzee-rl-checkpoints \
   --local-dir checkpoints/win_loss_margin_32simsrun4
 ```
 
-See [HUGGINGFACE_MODEL_CARD.md](HUGGINGFACE_MODEL_CARD.md) for the draft model
-card used to describe the checkpoint repository.
+Checkpoint compatibility is tied to the model architecture and the code's
+checkpoint format. The published checkpoints use `hidden_dim=256` and can be
+resumed or evaluated while changing runtime knobs such as `--num-simulations`,
+`--batch-size`, replay size, and minibatch settings. They are not compatible
+with architecture changes such as a different `--hidden-dim`, and are best used
+with the dependency versions from this repository.
 
 Evaluate it against the heuristic baseline:
 
@@ -75,11 +79,31 @@ python -m yahtzee_rl.evaluate \
   --sims-a 32
 ```
 
+## Install / Quickstart
+
+With `uv`:
+
+```bash
+git clone https://github.com/itxtx/yahtzeeRL.git
+cd yahtzeeRL
+uv sync --extra dev
+```
+
+Or with `pip`:
+
+```bash
+git clone https://github.com/itxtx/yahtzeeRL.git
+cd yahtzeeRL
+python -m venv .venv
+source .venv/bin/activate
+pip install -e '.[dev]'
+```
+
 ## Local CPU Smoke Tests
 
 ```bash
-python -m pytest
-python -m yahtzee_rl.evaluate --batch-size 16
+uv run pytest
+uv run python -m yahtzee_rl.evaluate --batch-size 16
 ```
 
 ## Training

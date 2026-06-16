@@ -11,6 +11,84 @@ training to `step_012800` regressed the greedy policy in direct comparison.
 
 ## Competitive Baseline
 
+### Reproducibility Receipt
+
+Best checkpoint:
+
+```text
+win_loss_margin_32simsrun4/step_011800
+```
+
+Recorded training segment leading into the headline checkpoint, reconstructed
+from the retained training log:
+
+```bash
+python -m yahtzee_rl.train \
+  --resume {CHECKPOINT_ROOT}/win_loss_margin_32simsrun4/step_010900 \
+  --checkpoint-dir {CHECKPOINT_ROOT}/win_loss_margin_32simsrun4 \
+  --steps 1000 \
+  --batch-size 32 \
+  --num-simulations 64 \
+  --minibatches-per-update 1 \
+  --teacher-every 3 \
+  --teacher-batch-size 12 \
+  --teacher-num-simulations 384 \
+  --teacher-minibatches-per-update 3 \
+  --buffer-size 50000 \
+  --seed 0
+```
+
+Runtime receipt:
+
+```text
+Hardware/runtime: Google Colab CUDA runtime; JAX reported [CudaDevice(id=0)]
+Seed: 0
+Training duration: exact final duration was not retained. The partial log shows
+  274/1000 updates after 2:28:15 for this segment; step_011800 was the 900th
+  update after resuming from step_010900.
+```
+
+Headline evaluation command:
+
+```bash
+python -m yahtzee_rl.evaluate \
+  --agent-a mcts \
+  --checkpoint-a {CHECKPOINT_ROOT}/win_loss_margin_32simsrun4/step_011800 \
+  --agent-b heuristic \
+  --num-games 512 \
+  --sims-a 32 \
+  --per-category \
+  --seed 0
+```
+
+Headline result:
+
+```text
+Agent A: mcts@step_11800
+Agent B: heuristic
+games: 512
+A win: 0.811 | B win: 0.186 | draw: 0.004
+mean score A: 204.28 | B: 164.48 | margin: 39.80
+
+Per-category means
+Category                    A        B
+ones                     1.25     1.12
+twos                     3.77     3.38
+threes                   6.86     5.61
+fours                    9.76     8.35
+fives                   13.04    10.20
+sixes                   15.89    13.12
+three_of_a_kind         20.16    18.75
+four_of_a_kind          15.98    17.31
+full_house              22.02    23.10
+small_straight          27.95     8.32
+large_straight          33.20    12.66
+yahtzee                  9.86    23.24
+chance                  22.07    18.84
+```
+
+### Later Checkpoint Versus Heuristic
+
 ```text
 Agent A: greedy@step_12800
 Agent B: heuristic

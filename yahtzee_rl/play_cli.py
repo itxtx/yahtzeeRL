@@ -46,6 +46,30 @@ def legal_human_actions(state: EnvState) -> list[int]:
     return [idx for idx, legal in enumerate(mask.tolist()) if legal]
 
 
+def compact_hold_action_labels(actions: list[int], dice: list[int]) -> list[str]:
+    """Collapse hold masks that keep the same multiset of dice values."""
+    groups: dict[tuple[int, ...], list[int]] = {}
+    for action in actions:
+        kept = tuple(
+            die for die, keep in zip(dice, action_label_hold_mask(action)) if keep
+        )
+        groups.setdefault(kept, []).append(action)
+
+    labels = []
+    for aliases in groups.values():
+        canonical = aliases[0]
+        label = action_label(canonical, dice)
+        if len(aliases) > 1:
+            same_as = ", ".join(f"h{action:02d}" for action in aliases[1:])
+            label = f"{label} (same as {same_as})"
+        labels.append(label)
+    return labels
+
+
+def action_label_hold_mask(action: int) -> list[bool]:
+    return [bool((action >> idx) & 1) for idx in range(c.NUM_DICE)]
+
+
 def print_human_options(state: EnvState) -> None:
     dice = jax.device_get(state.dice[0]).tolist()
     scores = jax.device_get(score_categories(state.dice)[0]).tolist()
@@ -53,9 +77,9 @@ def print_human_options(state: EnvState) -> None:
 
     if state.rolls_left[0] > 0:
         print("\nReroll actions:")
-        for action in legal:
-            if action < c.NUM_HOLD_ACTIONS:
-                print(f"  {action_label(action, dice)}")
+        hold_actions = [action for action in legal if action < c.NUM_HOLD_ACTIONS]
+        for label in compact_hold_action_labels(hold_actions, dice):
+            print(f"  {label}")
 
     print("\nScore actions:")
     for action in legal:
