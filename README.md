@@ -1,5 +1,7 @@
 # YahtzeeRL
 
+[![CI](https://github.com/itxtx/yahtzeeRL/actions/workflows/ci.yml/badge.svg)](https://github.com/itxtx/yahtzeeRL/actions/workflows/ci.yml)
+
 JAX/Flax/RLax Yahtzee self-play experiments with MCTS.
 
 The current implementation targets two-player head-to-head self-play using
@@ -15,6 +17,16 @@ Training samples minibatches from a replay buffer of recent self-play frames
 and regresses values onto a blend of the terminal outcome and the search root
 value (`--value-target-outcome-weight`). Evaluation and CLI play run the search
 without Dirichlet noise and act greedily on visit counts.
+
+Because this is a two-player game, the search uses a **negamax** value
+convention threaded through the chance node. `mctx` hardcodes reward 0 and
+discount +1 on decision→afterstate edges, so an afterstate value is read from
+the acting player's perspective. The perspective flip happens on the
+chance→state edge, where the reroll resolves: the discount is `-1` when scoring
+passed the turn to the opponent, `+1` when the same player continues after a
+hold, and `0` into a terminal state (with the terminal reward delivered on that
+edge, from the acting player's perspective). Getting this sign handling right is
+what lets a single value head serve both seats.
 
 ## Project Status
 
@@ -121,7 +133,8 @@ python -m yahtzee_rl.evaluate \
 
 ## Install / Quickstart
 
-With `uv`:
+`uv` is the recommended and CI-tested path — it installs the exact, known-good
+versions from `uv.lock` (including `mctx>=0.0.6`, which the search code requires):
 
 ```bash
 git clone https://github.com/itxtx/yahtzeeRL.git
@@ -129,15 +142,18 @@ cd yahtzeeRL
 uv sync --extra dev
 ```
 
-Or with `pip`:
+`pip` also works and resolves the same dependencies from `pyproject.toml`:
 
 ```bash
 git clone https://github.com/itxtx/yahtzeeRL.git
 cd yahtzeeRL
 python -m venv .venv
 source .venv/bin/activate
-pip install -e '.[dev]'
+pip install -e '.[dev]'   # equivalently: pip install -r requirements.txt
 ```
+
+Requires Python >= 3.11. All dependencies are declared in `pyproject.toml`;
+`requirements.txt` just redirects pip there so the two never drift.
 
 ## Local CPU Smoke Tests
 

@@ -10,5 +10,5 @@ runs/
 *.egg-info/
 dist/
 build/
-checkpoints/
 .DS_Store
+.Rhistory
