@@ -65,6 +65,11 @@ The agent crosses parity around step ~6k, climbs into the low-0.8s, and peaks
 near step 11.8k–11.9k before a mild regression — the empirical reason to
 preserve `step_011800` rather than treat later checkpoints as the new default.
 
+The flat ~164 baseline line is not a weak opponent: the heuristic itself beats a
+uniform-random policy 100% of the time (mean 164 vs 46), so the skill ladder is
+random ~46 → heuristic ~164 → agent ~204, and the 81% win rate is over a
+genuinely strong baseline. See [EVAL_RESULTS.md](EVAL_RESULTS.md#baseline-calibration).
+
 Regenerate it without re-running the sweep:
 
 ```bash

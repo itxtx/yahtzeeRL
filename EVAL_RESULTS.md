@@ -9,6 +9,30 @@ Unless noted otherwise, checkpoints refer to the
 `step_011800` is the best competitive checkpoint observed so far. Continuing
 training to `step_012800` regressed the greedy policy in direct comparison.
 
+## Baseline Calibration
+
+To make the agent's win rate legible, the heuristic baseline is itself measured
+against a uniform-random policy. The heuristic is strong: it wins every game and
+scores ~3.6x random, so beating it is a meaningful result rather than beating a
+pushover.
+
+```text
+Agent A: heuristic
+Agent B: random
+games: 512
+A win: 1.000 | B win: 0.000 | draw: 0.000
+mean score A: 164.41 | B: 46.07 | margin: 118.34
+```
+
+This anchors a clear skill ladder by mean score: random ~46 -> heuristic ~164 ->
+`step_011800` agent ~204 (the agent beats the heuristic 81.1% of the time; see
+below).
+
+```bash
+python -m yahtzee_rl.evaluate \
+  --agent-a heuristic --agent-b random --num-games 512 --seed 0
+```
+
 ## Competitive Baseline
 
 ### Reproducibility Receipt
